@@ -3,6 +3,7 @@
 % The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
 \usepackage{cite}
 \usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithm} % add by pete
 \usepackage{algorithmic}
 \usepackage{graphicx}
 % declare the path(s) where your graphic files are
@@ -177,7 +178,10 @@ Taking computing power and energy limit of a smartphone into account, our propos
 3) $A = \left\{ {{a_{ij}}} \right\}$ is the state transition probability distribution, where \\ ${a_{ij}} = p\left\{ {{q_{t + 1}} = {s_j}|{q_t} = {s_i}} \right\}, i, j \le N$, where ${q_t}$ denotes the state at time $t$. In our case, the transition probability $a_{ij}$ is the probability of walking to the next road segment $s_{j,t}$ given the current road segment is $s_{i,t-1}$. Intuitively, for probable transition between two road segments, the pedestrian's activity should match the activity type between the same two segments. Therefore, given the detected activity of a pedestrian ${Ped_{AT}}(t)$ at time $t$ and the activity type between two segments ${Seg_{AT}}^{ij}$, AiFiMatch models this intuition by a formula \ref{equ_transition}, where $p({Ped_{AT}}(t)|{Seg_{AT}}^{ij})$ can be found in confusion matrix.
 \begin{equation}
 \label{equ_transition}
-p({s_{j,t}}|{s_{i,t - 1}}) = p({s_j}|{s_i},{Ped_{AT}}(t)) = p({Ped_{AT}}(t)|{Seg_{AT}}^{ij})
+\begin{array}{l}
+p({s_{j,t}}|{s_{i,t - 1}}) = p({s_j}|{s_i},Pe{d_{AT}}(t))\\
+= p(Pe{d_{AT}}(t)|Se{g_{AT}}^{ij})
+\end{array}
 \end{equation}
 
 4) $B = \left\{ {{b_i}(k)} \right\}$ is the observation probability distribution in state $i$, where ${b_i}(k) = p\{ {z_t} = {v_k}|{q_t} = {s_i}\},1 \le i \le N,1 \le k \le M$ and $z_t$ and $q_t$ are the observation and state at time $t$, respectively. Observation probabilities also called emission probabilities represent the likelihood that a measurement resulted from a given state. In our case, given a displacement observation $z.dist(t)$, there is an emission probability $p(z.dist(t)|{s_i}.dist$ for each candidate road segment $s_i$. If a pedestrian has passed the complete road segment $s_i$, AiFiMatch models the emission probability as a Gaussian Distribution:
@@ -187,14 +191,20 @@ p({s_{j,t}}|{s_{i,t - 1}}) = p({s_j}|{s_i},{Ped_{AT}}(t)) = p({Ped_{AT}}(t)|{Seg
 \end{equation}
 where $\sigma _d$ is the standard deviation of the measured displacement. Based on the distance calculation method of PDR, the displacement is in direction proportion to step length. Therefore, $\sigma _d$ can be obtained based on the standard deviation of step length. Considering the situation that a pedestrian is walking on the road segment, all long enough candidate road segments should have the same probability, AiFiMatch models the situation using a formula as:
 \begin{equation}
-{f_2}({\rm{z}}.{\rm{dist}}({\rm{t}}),{{\rm{s}}_{\rm{i}}}.{\rm{dist}}) = \frac{{{e^{ - 4.5}}}}{{\sqrt {2\pi } {\sigma _d}}},z.dist(t) + 3{\sigma _d} \le {s_i}.dist
+\begin{array}{l}
+{f_2}({\rm{z}}.{\rm{dist}}({\rm{t}}),{{\rm{s}}_{\rm{i}}}.{\rm{dist}})\\
+= \frac{1}{{\sqrt {2\pi } {\sigma _d}}}{e^{ - 4.5}},z.dist(t) + 3{\sigma _d} \le {s_i}.dist
+\end{array}
 \end{equation}
 Hence, the final emission probability, $p(z|s_i)$, is modeled as:
 \begin{equation}
-p(z|s_i)=f(z.dist,{s_i}.dist) = \left\{ {\begin{array}{*{20}{l}}
-	{\frac{1}{{\sqrt {2\pi } {\sigma _d}}}{e^{-4.5}},z.dist + 3{\sigma _d} \le {s_i}.dist}\\
+\begin{array}{l}
+p(z|{s_i}) = f(z.dist,{s_i}.dist)\\
+= \left\{ {\begin{array}{*{20}{l}}
+	{\frac{1}{{\sqrt {2\pi } {\sigma _d}}}{e^{ - 4.5}},z.dist + 3{\sigma _d} \le {s_i}.dist}\\
 	{\frac{1}{{\sqrt {2\pi } {\sigma _d}}}{e^{ - \frac{{{{(z.dist - {s_i}.dist)}^2}}}{{2{\sigma _d}^2}}}},otherwise}
 	\end{array}} \right.
+\end{array}
 \end{equation}
 
 5) $\pi  = \left\{ {{\pi _i}} \right\}$ is the initial state distribution, where ${\pi _i} = p\left\{ {{q_1} = {S_i}} \right\},1 \le i \le N$. If the starting point or the first road segment is known, the initial state distribution is $1$ since the first road segment is the only candidate; otherwise, all candidate road segments are selected by the \emph{Candidate Extraction} module and the initial state distribution is uniform in all candidates. Let $S_c$ denote the set of all candidates, and the initial state distribution is re-estimated after each step by formula \ref{equ_initupdate} until the first location-related activity is detected.
@@ -209,10 +219,13 @@ AiFiMatch uses the heading direction of a pedestrian and Wi-Fi fingerprint to se
 
 Intuitively, the heading direction of a pedestrian should match the direction of road segment. Therefore, AiFiMatch models the direction difference by the following function to select the candidates:
 \begin{equation}
-{g_1} = {g_1}({Ped_{dir}},s) = \left\{ {\begin{array}{*{20}{l}}
-	{1,if\left| {{Ped_{dir}} - s.{d_j}} \right| < H_{TH},j = 1,2}\\
+\begin{array}{l}
+{g_1} = {g_1}(Pe{d_{dir}},s)\\
+= \left\{ {\begin{array}{*{20}{l}}
+	{1,if\left| {Pe{d_{dir}} - s.{d_j}} \right| < {H_{TH}},j = 1,2}\\
 	{0,otherwise}
 	\end{array}} \right.
+\end{array}
 \end{equation}
 where $Ped_{dir}$ denotes the heading direction of a pedestrian, $s$ is a state, $H_{TH}$ is the threshold for candidate extraction, which is set to $55^\circ$ based on the experiments.
 
@@ -241,18 +254,24 @@ AiFiMatch introduces Wi-Fi dissimilarity to distinguish multiple hypotheses due 
 \end{equation}
 where Equation \ref{equ-jad} is known as Jaccard distance. With this dissimilarity of two fingerprints, we define the similarity function $L(S_a, S_b)$ between two fingerprint sequences $S_a = (f_1^a,f_2^a,\cdots,f_w^a)$, $S_b = (f_1^b, f_2^b, \cdots, f_k^b)$:
 \begin{equation}
-\begin{array}{c}
-L({S_a},{\rm{ }}{S_b}) = \min (\frac{1}{w}\sum\limits_{t = 1}^w {{J_\delta }({f_t}^a,{f_{i + t}}^b),0 \le i \le k - w,} \\
-\frac{1}{w}\sum\limits_{t = 1}^w {{J_\delta }({f_t}^a,{f_{j - t}}^b),w + 1 \le j \le k + 1} )
+\begin{array}{*{20}{c}}
+\begin{array}{l}
+L({S_a},{S_b})\\
+= \min (\frac{1}{w}\sum\limits_{t = 1}^w {{J_\delta }({f_t}^a,{f_{i + t}}^b),0 \le i \le k - w,} 
+\end{array}\\
+{\frac{1}{w}\sum\limits_{t = 1}^w {{J_\delta }({f_t}^a,{f_{j - t}}^b),w + 1 \le j \le k + 1} )}
 \end{array}
 \end{equation}
 where $w=|S_a|$, $k=|S_b|$ and $2<w<k$. Given segment candidate set $G$ and the set $R$ of all road segments bound with Wi-Fi fingerprints sequence, Finally, AiFiMatch models the dissimilarity of two Wi-Fi fingerprint sequences and the different stages of fingerprint database by the following function to select the candidates: 
 \begin{equation}
-{g_2}({S_{ped,}}{S_i}) = \left\{ {\begin{array}{*{20}{l}}
-	{0,if{\kern 1pt} i{\kern 1pt}  \ne \mathop {\arg \min }\limits_j \{ L({S_{ped,}}{S_j}),{S_j} \in G,G \subseteq R\} }\\
-	{0,if{\kern 1pt} \min \{ L({S_{ped}},{S_i}),{\kern 1pt} {\kern 1pt} {S_i} \in G{\kern 1pt} {\kern 1pt}  \cap R\}  > d{\kern 1pt} {\kern 1pt} }\\
+\begin{array}{l}
+{g_2}({S_{ped}},{S_i})\\
+= \left\{ {\begin{array}{*{20}{l}}
+	{0,if{\kern 1pt} i \ne \mathop {argmin}\limits_j \{ L({S_{ped}},{S_j}),{S_j} \in G,G \subseteq R\} }\\
+	{0,if{\kern 1pt} min\{ L({S_{ped}},{S_i}),{S_i} \in G \cap R\}  > d}\\
 	{1,otherwise}
 	\end{array}} \right.
+\end{array}
 \end{equation}
 where $d$ is the threshold to distinguish two Wi-Fi fingerprint sequences. A pilot study is conducted to evaluate the dissimilarities between two fingerprint sequences of same and different road segments and the experimental result is shown in Fig. \ref{fig-wifidist}. In the paper, $d$ is set to $0.63$ based on the experiment. 
 
@@ -262,6 +281,36 @@ where $d$ is the threshold to distinguish two Wi-Fi fingerprint sequences. A pil
 		\caption{Dissimilarity of Two Wi-Fi Fingerprint Sequences.}
 	\label{fig-wifidist}
 \end{figure}
+
+\subsection{Algorithm}
+
+\begin{algorithm}[H]
+	\caption{One Iterative Process of Our Approach}
+	\label{alg_imt}
+	\begin{algorithmic}[1]
+		\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+		\renewcommand{\algorithmicensure}{\textbf{Output:}}
+		\REQUIRE Sequence of Determined Locations: $s_{0:n}$
+		\REQUIRE Corresponding RSS Values: $r_{0:n}$
+		\REQUIRE Locations and Path Loss Exponents of known APs: $L_{ap}^i,{\mu ^i}$
+		\ENSURE Path Loss Exponent: ${\hat \mu }$
+		\ENSURE List of APs' Locations Estimation: ${\hat L}_{ap}$	
+		\STATE $S_e,R_e,S_v,R_v=divideTwo(s_{0:n},r_{0:n})$
+		\STATE $errorDist_{last} \leftarrow \alpha\ //\alpha\ is\ a\ large\ enough\ value$
+		\FOR{$\mu=2.0\ to\ 5.0\ step\ 0.05$}
+		\STATE $L_{ap}=multi\_trilateration(\mu,S_e,R_e,L_{ap}^i,{\mu ^i})$
+		\STATE ${\bar S}_v=multi\_trilateration(\mu,L_{ap},R_v)$
+		\STATE $errorDist=meanDistance(S_v,{\bar S}_v)$
+		\IF{$errorDist\ >\ errorDist_{last}$}
+		\STATE break
+		\ENDIF
+		\STATE $errorDist_{last} \leftarrow errorDist$
+		\STATE ${\hat \mu } \leftarrow \mu$
+		\STATE ${\hat L}_{ap} \leftarrow L_{ap}$
+		\ENDFOR
+		\RETURN ${\hat \mu },{\hat L}_{ap}$
+	\end{algorithmic}
+\end{algorithm}
 
 \section{Evaluation}
 
