@@ -187,7 +187,7 @@ p({s_{j,t}}|{s_{i,t - 1}}) = p({s_j}|{s_i},{Ped_{AT}}(t)) = p({Ped_{AT}}(t)|{Seg
 \end{equation}
 where $\sigma _d$ is the standard deviation of the measured displacement. Based on the distance calculation method of PDR, the displacement is in direction proportion to step length. Therefore, $\sigma _d$ can be obtained based on the standard deviation of step length. Considering the situation that a pedestrian is walking on the road segment, all long enough candidate road segments should have the same probability, AiFiMatch models the situation using a formula as:
 \begin{equation}
-{f_2}({\rm{z}}{\rm{.dist(t),}}{{\rm{s}}_{\rm{i}}}{\rm{.dist}}) = \frac{1}{{\sqrt {2\pi } {\sigma _d}}}{e^{-4.5}},z.dist(t) + 3{\sigma _d} \le {s_i}.dist
+{f_2}({\rm{z}}.{\rm{dist}}({\rm{t}}),{{\rm{s}}_{\rm{i}}}.{\rm{dist}}) = \frac{{{e^{ - 4.5}}}}{{\sqrt {2\pi } {\sigma _d}}},z.dist(t) + 3{\sigma _d} \le {s_i}.dist
 \end{equation}
 Hence, the final emission probability, $p(z|s_i)$, is modeled as:
 \begin{equation}
@@ -286,7 +286,7 @@ Euclidean distance between the estimated position and the ground truth is introd
 
 \begin{figure}[!htbp]
 	\centering
-	\includegraphics[width=2.8in]{AiFiMatch-OnlinePosition}
+	\includegraphics[width=3.35in]{AiFiMatch-OnlinePosition}
 	\caption{Online positioning results for Each Trajectory.}
 	\label{fig-online}
 \end{figure}
