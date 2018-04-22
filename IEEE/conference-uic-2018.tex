@@ -7,6 +7,7 @@
 \usepackage{graphicx}
 % declare the path(s) where your graphic files are
 \graphicspath{{./Figs/}}
+\usepackage[caption=false,font=footnotesize]{subfig}
 \usepackage{textcomp}
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
@@ -76,181 +77,282 @@ Map Matching, Hidden Markov Model, Activity Detection, Crowdsourced Wi-Fi
 
 \section{Introduction}
 
-Location based services (LBS) have spilled over into all aspects of people's daily life. Outdoors, global positioning system (GPS) is able to provide a reasonably good positioning \cite{zampella2015indoor}. However, robust and effective indoor pedestrian positioning is still at its infancy due to the blockage of GPS signals. 
+Location based services (LBS) have spilled over into all aspects of people's daily life. Outdoors, global positioning system (GPS) is able to provide a reasonably good positioning \cite{zampella2015indoor}. However, robust and effective indoor pedestrian positioning is still at its infancy due to the blockage of GPS signals.
 
-\section{Ease of Use}
+It is common for indoor positioning schemes to leverage on pre-installed infrastructure like Wi-Fi, UWB, RFID, Bluetooth, and so on \cite{bahl2000enhancements,ni2004landmarc}. These systems offer absolute positioning with a limited error level,but rely on expensive hardware or time-consuming pre-training. At present, motion sensors, including accelerometer, gyroscope and magnetometer, are widely used in smartphones. Therefore, dead reckoning (DR) techniques using motion sensors are another way for indoor positioning, which derive the current position by adding the estimated displacement to the previous one. DR techniques are known as  pedestrian dead reckoning (PDR) for pedestrian tracking and positioning \cite{zhou2015activity,zhou2015alimc}. The PDR technique itself does not provide a final solution to the pedestrian positioning problem and another technique is required to provide the initial position estimates.
 
-\subsection{Maintaining the Integrity of the Specifications}
+The positioning error of PDR technique mainly comes from step length and direction estimation errors and even small errors will be magnified by cumulation over time. Indoor map information may be connected with PDR, namely map matching algorithm \cite{aly2015semmatch}. Several map matching algorithms have been proposed to constrain the cumulative errors \cite{zampella2015indoor,zhou2015activity,abdelnasser2016semanticslam,fu2017crowdsourcing}.  One algorithm uses activity-related locations as virtual landmarks to find the optimal trajectory of a pedestrian. The activity-related locations are special locations of a building, such as an elevator, a stair, a corner, and so on. When a pedestrian passes these locations, the pedestrian's activities can be distinguished from normal walking. Human activity detection (AD) algorithms based on smartphones have attracted more and more researchers' attention in the past decade. Given the symmetry of indoor environment, activity-based map matching algorithms fails since there may be more than one alternatives for the same activity feature or activity sequence \cite{zhou2015activity}.
 
-The IEEEtran class file is used to format your paper and style the text. All margins, 
-column widths, line spaces, and text fonts are prescribed; please do not 
-alter them. You may note peculiarities. For example, the head margin
-measures proportionately more than is customary. This measurement 
-and others are deliberate, using specifications that anticipate your paper 
-as one part of the entire proceedings, and not as an independent document. 
-Please do not revise any of the current designations.
+Crowdsourcing is a low-cost and efficient way to extract useful information from data acquired by crowd participants. The crowdsourcing method has been successfully applied to construct Wi-Fi fingerprint database \cite{zhang2014robust}. At present, Wi-Fi access points (AP) have been widely developed in public buildings. It is feasible to introduce Wi-Fi signal feature into map matching algorithms \cite{seitz2010hidden}. Therefore this paper proposed AiFiMatch: a novel hidden markov model (HMM) based map matching algorithm, which integrates activity-based map matching and crowdsourced Wi-Fi. The fundamental idea of this algorithm is that smartphones can simultaneously collect motion sensors data and Wi-Fi received signal strength (RSS) values as pedestrians walking. Wi-Fi RSS can be a new feature to eliminate the symmetry of indoor environments and reduce the number of candidate hidden states in our HMM model. Thus, AiFiMatch can get the pedestrian's position estimations within a short time delay. 
 
-\section{Prepare Your Paper Before Styling}
-Before you begin to format your paper, first write and save the content as a 
-separate text file. Complete all content and organizational editing before 
-formatting. Please note sections \ref{AA}--\ref{SCM} below for more information on 
-proofreading, spelling and grammar.
+The remainder of this paper is organized as follows: Section II gives an overview of the AiFiMatch system and its preprocessing components. Then, we detail the proposed HMM-based map matching algorithm in Section III. Section IV shows the experimental results and analysis of the AiFiMatch system. Finally, Section V and Section VI review related work and conclude this paper, respectively.
 
-Keep your text and graphic files separate until after the text has been 
-formatted and styled. Do not number text heads---{\LaTeX} will do that 
-for you.
+\section{AiFiMatch Overview}
 
-\subsection{Abbreviations and Acronyms}\label{AA}
-Define abbreviations and acronyms the first time they are used in the text, 
-even after they have been defined in the abstract. Abbreviations such as 
-IEEE, SI, MKS, CGS, ac, dc, and rms do not have to be defined. Do not use 
-abbreviations in the title or heads unless they are unavoidable.
+AiFiMatch is an activity-based map matching system to pedestrian dead reckoning problem. In this section, we first provide an overview of the AiFiMatch system and then describe the details of its preprocessing components including PDR implementation based on smartphone, activity detection and indoor floor plan abstraction. We leave the details of the core of AiFiMatch system, the HMM based map matching module, to the next section.
 
-\subsection{Units}
-\begin{itemize}
-\item Use either SI (MKS) or CGS as primary units. (SI units are encouraged.) English units may be used as secondary units (in parentheses). An exception would be the use of English units as identifiers in trade, such as ``3.5-inch disk drive''.
-\item Avoid combining SI and CGS units, such as current in amperes and magnetic field in oersteds. This often leads to confusion because equations do not balance dimensionally. If you must use mixed units, clearly state the units for each quantity that you use in an equation.
-\item Do not mix complete spellings and abbreviations of units: ``Wb/m\textsuperscript{2}'' or ``webers per square meter'', not ``webers/m\textsuperscript{2}''. Spell out units when they appear in text: ``. . . a few henries'', not ``. . . a few H''.
-\item Use a zero before decimal points: ``0.25'', not ``.25''. Use ``cm\textsuperscript{3}'', not ``cc''.)
-\end{itemize}
+\begin{figure*}[htbp]
+	\centerline{\includegraphics[width=5.85in]{AiFiMatch-Architecture}}
+	\caption{AiFiMatch System Architecture.}
+	\label{fig-architecture}
+\end{figure*}
 
-\subsection{Equations}
-Number equations consecutively. To make your 
-equations more compact, you may use the solidus (~/~), the exp function, or 
-appropriate exponents. Italicize Roman symbols for quantities and variables, 
-but not Greek symbols. Use a long dash rather than a hyphen for a minus 
-sign. Punctuate equations with commas or periods when they are part of a 
-sentence, as in:
+\subsection{Architecture Overview}
+
+The overall architecture of the AiFiMatch system is shown in Fig. \ref{fig-architecture}. The input to the system is a indoor floor plan and time-stamped sensor data including motion data and Wi-Fi fingerprint. AiFiMatch utilizes embedded sensors of a smartphone to simultaneously collect motion data and Wi-Fi RSS values while the indoor floor plan can be manually entered or generated by crowdsourcing based indoor map construction algorithm.
+
+Firstly, AiFiMatch starts by indoor floor plan abstraction to create a directed graph to facilitate the map matching model establishment. Secondly, the system estimates the walking distance and heading direction with data of motion sensors. Finally, location-related activities are detected with the pre-trained decision tree, and then the pedestrian's trajectory data including motion data and Wi-Fi RSS values are divided into trajectory subsets sequence.  
+
+The directed graph of indoor floor plan and walking trajectory subsets sequence are then passed to the HMM based map matching module whose outputs include the pedestrian position estimations and Wi-Fi fingerprints. These Wi-Fi fingerprints can be used to update indoor radio map. Our proposed HMM based map matching module contains three sub-modules: Candidate Extraction, Incremental Walking Trajectory Matching and an Online Viterbi Decoder. The Candidate Extraction module determines the candidate road segments from the directed graph of indoor floor plan that satisfy the spatial and Wi-Fi signal conditions. The module takes into account the errors of pedestrian heading direction estimation and the previous bound Wi-Fi fingerprint. The Incremental Walking Trajectory Matching module integrates a number of modifications to the standard HMM based map matching algorithm to take walking trajectory subsets sequence into account as well as the detected activities to enhance the accuracy of the estimated indoor road paths. Finally, the Online Viterbi Decoder uses dynamic programming to efficiently determine the most probable indoor road segments sequence.
+
+\subsection{Preprocessing}
+
+In the balance of this section, we give the details of three preprocessing components and leave the details of the map matching and Wi-Fi enhancement algorithm to the next section.
+
+\subsubsection{PDR Implementation Based on Smartphone}
+
+PDR is a positioning scheme that derives the current position by adding the estimated displacement to the previous one based on motion sensors carried by smartphones. In PDR scheme, the pedestrian's position is usually updated by the step and the heading direction during one step is supposed to be unchanged. The pedestrian's position after $k-1$ steps can be denoted as $(x_{k-1},y_{k-1})$. The $k$-th step length and heading direction are denoted as $sl_k$ and $\theta_k$, respectively. Then, the pedestrian's position after $k$ steps can be obtained by the following formula:
 \begin{equation}
-a+b=\gamma\label{eq}
+	\label{equ_pdr}
+	({x_k},{y_k}) = ({x_{k - 1}} + s{l_k} \cdot sin{\theta _k},{y_{k - 1}} + s{l_k} \cdot \cos {\theta _k})
 \end{equation}
 
-Be sure that the 
-symbols in your equation have been defined before or immediately following 
-the equation. Use ``\eqref{eq}'', not ``Eq.~\eqref{eq}'' or ``equation \eqref{eq}'', except at 
-the beginning of a sentence: ``Equation \eqref{eq} is . . .''
+The heading direction is measured by the fusion of gyroscope and magnetometer. The step length and step count estimate approach is out of scope of this paper and can be found in \cite{wang2012no}.
 
-\subsection{\LaTeX-Specific Advice}
+\subsubsection{Activity Detection}
 
-Please use ``soft'' (e.g., \verb|\eqref{Eq}|) cross references instead
-of ``hard'' references (e.g., \verb|(1)|). That will make it possible
-to combine sections, add equations, or change the order of figures or
-citations without having to go through the file line by line.
+\begin{figure*}[!ht]
+	\centering
+	\subfloat[$Decision\ Tree\ for\ Activity\ Detection$]{\includegraphics[width=4.75in]{AiFiMatch-ActivityDecision}%
+		\label{fig-activity}}
+	\vfil
+	\subfloat[$Activity\ Detected\ Example$]{\includegraphics[width=4.85in]{AiFiMatch-TurnDemo}%
+		\label{fig-turndemo}}
+	\caption{Decision Tree for Activity Detection and An Example}
+\end{figure*}
 
-Please don't use the \verb|{eqnarray}| equation environment. Use
-\verb|{align}| or \verb|{IEEEeqnarray}| instead. The \verb|{eqnarray}|
-environment leaves unsightly spaces around relation symbols.
-
-Please note that the \verb|{subequations}| environment in {\LaTeX}
-will increment the main equation counter even when there are no
-equation numbers displayed. If you forget that, you might write an
-article in which the equation numbers skip from (17) to (20), causing
-the copy editors to wonder if you've discovered a new method of
-counting.
-
-{\BibTeX} does not work by magic. It doesn't get the bibliographic
-data from thin air but from .bib files. If you use {\BibTeX} to produce a
-bibliography you must send the .bib files. 
-
-{\LaTeX} can't read your mind. If you assign the same label to a
-subsubsection and a table, you might find that Table I has been cross
-referenced as Table IV-B3. 
-
-{\LaTeX} does not have precognitive abilities. If you put a
-\verb|\label| command before the command that updates the counter it's
-supposed to be using, the label will pick up the last counter to be
-cross referenced instead. In particular, a \verb|\label| command
-should not go before the caption of a figure or a table.
-
-Do not use \verb|\nonumber| inside the \verb|{array}| environment. It
-will not stop equation numbers inside \verb|{array}| (there won't be
-any anyway) and it might stop a wanted equation number in the
-surrounding equation.
-
-\subsection{Some Common Mistakes}\label{SCM}
-\begin{itemize}
-\item The word ``data'' is plural, not singular.
-\item The subscript for the permeability of vacuum $\mu_{0}$, and other common scientific constants, is zero with subscript formatting, not a lowercase letter ``o''.
-\item In American English, commas, semicolons, periods, question and exclamation marks are located within quotation marks only when a complete thought or name is cited, such as a title or full quotation. When quotation marks are used, instead of a bold or italic typeface, to highlight a word or phrase, punctuation should appear outside of the quotation marks. A parenthetical phrase or statement at the end of a sentence is punctuated outside of the closing parenthesis (like this). (A parenthetical sentence is punctuated within the parentheses.)
-\item A graph within a graph is an ``inset'', not an ``insert''. The word alternatively is preferred to the word ``alternately'' (unless you really mean something that alternates).
-\item Do not use the word ``essentially'' to mean ``approximately'' or ``effectively''.
-\item In your paper title, if the words ``that uses'' can accurately replace the word ``using'', capitalize the ``u''; if not, keep using lower-cased.
-\item Be aware of the different meanings of the homophones ``affect'' and ``effect'', ``complement'' and ``compliment'', ``discreet'' and ``discrete'', ``principal'' and ``principle''.
-\item Do not confuse ``imply'' and ``infer''.
-\item The prefix ``non'' is not a word; it should be joined to the word it modifies, usually without a hyphen.
-\item There is no period after the ``et'' in the Latin abbreviation ``et al.''.
-\item The abbreviation ``i.e.'' means ``that is'', and the abbreviation ``e.g.'' means ``for example''.
-\end{itemize}
-An excellent style manual for science writers .
-
-\subsection{Authors and Affiliations}
-\textbf{The class file is designed for, but not limited to, six authors.} A 
-minimum of one author is required for all conference articles. Author names 
-should be listed starting from left to right and then moving down to the 
-next line. This is the author sequence that will be used in future citations 
-and by indexing services. Names should not be listed in columns nor group by 
-affiliation. Please keep your affiliations as succinct as possible (for 
-example, do not differentiate among departments of the same organization).
-
-\subsection{Identify the Headings}
-Headings, or heads, are organizational devices that guide the reader through 
-your paper. There are two types: component heads and text heads.
-
-Component heads identify the different components of your paper and are not 
-topically subordinate to each other. Examples include Acknowledgments and 
-References and, for these, the correct style to use is ``Heading 5''. Use 
-``figure caption'' for your Figure captions, and ``table head'' for your 
-table title. Run-in heads, such as ``Abstract'', will require you to apply a 
-style (in this case, italic) in addition to the style provided by the drop 
-down menu to differentiate the head from the text.
-
-Text heads organize the topics on a relational, hierarchical basis. For 
-example, the paper title is the primary text head because all subsequent 
-material relates and elaborates on this one topic. If there are two or more 
-sub-topics, the next level head (uppercase Roman numerals) should be used 
-and, conversely, if there are not at least two sub-topics, then no subheads 
-should be introduced.
-
-\subsection{Figures and Tables}
-\paragraph{Positioning Figures and Tables} Place figures and tables at the top and 
-bottom of columns. Avoid placing them in the middle of columns. Large 
-figures and tables may span across both columns. Figure captions should be 
-below the figures; table heads should appear above the tables. Insert 
-figures and tables after they are cited in the text. Use the abbreviation 
-``Fig.~\ref{fig}'', even at the beginning of a sentence.
-
-\begin{table}[htbp]
-\caption{Table Type Styles}
-\begin{center}
-\begin{tabular}{|c|c|c|c|}
-\hline
-\textbf{Table}&\multicolumn{3}{|c|}{\textbf{Table Column Head}} \\
-\cline{2-4} 
-\textbf{Head} & \textbf{\textit{Table column subhead}}& \textbf{\textit{Subhead}}& \textbf{\textit{Subhead}} \\
-\hline
-copy& More table copy$^{\mathrm{a}}$& &  \\
-\hline
-\multicolumn{4}{l}{$^{\mathrm{a}}$Sample of a Table footnote.}
-\end{tabular}
-\label{tab1}
-\end{center}
+\begin{table}
+	\label{tab_conf}
+	\caption{Confusion Matrix of Activity Detection}
+	\begin{center}
+		\begin{tabular}{| c | c | c | c | c |}
+			\hline
+			\bfseries Activity Type & \bfseries Left Turn & \bfseries Right Turn & \bfseries U-turn & \bfseries No Type\\
+			\hline
+			\bfseries Left Turn & 58 & 0 & 0 & 2 \\
+			\hline
+			\bfseries Right Turn & 0 & 59 & 0 & 1 \\
+			\hline
+			\bfseries U-turn & 0 & 0 & 60 & 0 \\
+			\hline
+		\end{tabular}
+	\end{center}
 \end{table}
 
-\begin{figure}[htbp]
-\centerline{\includegraphics{AiFiMatch-Architecture}}
-\caption{Example of a figure caption.}
-\label{fig}
+In this paper, AiFiMatch considers four types of pedestrian activities: stationary, normal walking, turning at a corner (left or right turn) and turning around (U-turn), which would occur on the flat ground. The decision tree for activity detection and signal features of each activity is shown in Fig. \ref{fig-activity}. The top level separates walking and stationary based on the variance of the accelerometer. With the help of gyroscope, the second level uses the rotation rate to separate the normal walking and turns while the third level separates the U-turn case from the left or right turn case based on the rotation angle during the turning. Three participants with smartphones were asked to complete three activities (U-turn, left and right turn) in our experimental environment. The sample size of each activity was $60$ traces. Fig. \ref{fig-turndemo} shows an example for activity detection and the activity detection result is summarized in Table \ref{tab_conf}.
+
+\subsubsection{Indoor Floor plan Abstraction}
+
+In the indoor environment, there are many activity-relative locations such as corridor corners and entrances of rooms where pedestrians may perform different activities other than normal walking. These special locations divide the indoor roads into segments. With road segments as nodes in the form of \emph{(coordinate of first endpoint $(x_1,y_1)$, accessible direction of first endpoint $({\theta}_1)$, coordinate of second endpoint $(x_2,y_2)$, accessible direction of second endpoint $({\theta}_2)$)}, the activity type from one road segment to another as directional edges in the form of \emph{(activity type (AT))}, the indoor floor plan would be represented as a direction graph. Fig. \ref{fig-abstract} shows an example of indoor floor abstraction. 
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=2.776in]{AiFiMatch-MapAbstract}
+	\caption{Floor Plan Abstraction Example.}
+	\label{fig-abstract}
 \end{figure}
 
-Figure Labels: Use 8 point Times New Roman for Figure labels. Use words 
-rather than symbols or abbreviations when writing Figure axis labels to 
-avoid confusing the reader. As an example, write the quantity 
-``Magnetization'', or ``Magnetization, M'', not just ``M''. If including 
-units in the label, present them within parentheses. Do not label axes only 
-with units. In the example, write ``Magnetization (A/m)'' or ``Magnetization 
-\{A[m(1)]\}'', not just ``A/m''. Do not label axes with a ratio of 
-quantities and units. For example, write ``Temperature (K)'', not 
-``Temperature/K''.
+\section{HMM based Map Matching Algorithm}
+
+Through this section, we detail the HMM based map matching module of AiFiMatch system. We first start by providing the novel HMM model and the details of its components. Then, we describe the Wi-Fi enhancement algorithm for our proposed HMM model.
+
+\subsection{Hidden Markov Model}
+
+Taking computing power and energy limit of a smartphone into account, our proposed map matching algorithm select HMM to match the pedestrian's trajectory subsets sequence to the directed graph of indoor floor plan. A HMM can be represented as $\lambda  = (S,V,A,B,\pi)$, where:
+
+1) $S = \left\{ {{s_1},{s_2},{s_3}, \ldots ,{s_N}} \right\}$ is the set of possible states and $N = \left| S \right|$. In our case, each state represents an indoor road segment, that is, a node of the directed graph. Note that two or more road segments connected by a straight line can form new states (Fig. \ref{fig-viterbi}). Therefore, a state $s_i$ is represented by the ordered tuple in the form of ($id,x_{1},y_{1},d_{1},x_{2},y_{2},d_{2}$), where $id$ is the identification of road segment, $x_{1}$, $y_{1}$, $d_{1}$, $x_{2}$, $y_{2}$ and $d_{2}$ are different attributes of node, respectively. 
+
+2) $V = \left\{ {{v_1},{v_2},{v_3}, \ldots ,{v_M}} \right\}$ is the set of observations from the model and $M = \left| V \right|$. For each walking trajectory of a pedestrian, PDR technique gives displacement and heading direction estimations. However, due to the interference of many kinds of metal materials to the magnetic field in buildings, the heading direction estimation has a large error. In our case, each observation is a displacement estimation and is represented by $(dist)$.
+
+3) $A = \left\{ {{a_{ij}}} \right\}$ is the state transition probability distribution, where \\ ${a_{ij}} = p\left\{ {{q_{t + 1}} = {s_j}|{q_t} = {s_i}} \right\}, i, j \le N$, where ${q_t}$ denotes the state at time $t$. In our case, the transition probability $a_{ij}$ is the probability of walking to the next road segment $s_{j,t}$ given the current road segment is $s_{i,t-1}$. Intuitively, for probable transition between two road segments, the pedestrian's activity should match the activity type between the same two segments. Therefore, given the detected activity of a pedestrian ${Ped_{AT}}(t)$ at time $t$ and the activity type between two segments ${Seg_{AT}}^{ij}$, AiFiMatch models this intuition by a formula \ref{equ_transition}, where $p({Ped_{AT}}(t)|{Seg_{AT}}^{ij})$ can be found in confusion matrix.
+\begin{equation}
+\label{equ_transition}
+p({s_{j,t}}|{s_{i,t - 1}}) = p({s_j}|{s_i},{Ped_{AT}}(t)) = p({Ped_{AT}}(t)|{Seg_{AT}}^{ij})
+\end{equation}
+
+4) $B = \left\{ {{b_i}(k)} \right\}$ is the observation probability distribution in state $i$, where ${b_i}(k) = p\{ {z_t} = {v_k}|{q_t} = {s_i}\},1 \le i \le N,1 \le k \le M$ and $z_t$ and $q_t$ are the observation and state at time $t$, respectively. Observation probabilities also called emission probabilities represent the likelihood that a measurement resulted from a given state. In our case, given a displacement observation $z.dist(t)$, there is an emission probability $p(z.dist(t)|{s_i}.dist$ for each candidate road segment $s_i$. If a pedestrian has passed the complete road segment $s_i$, AiFiMatch models the emission probability as a Gaussian Distribution:
+\begin{equation}
+\label{equ_emission1}
+{f_1}({\rm{z}}{\rm{.dist(t),}}{{\rm{s}}_{\rm{i}}}{\rm{.dist}}) = \frac{1}{{\sqrt {2\pi } {\sigma _d}}}{e^{ - \frac{{{{(z.dist(t) - {s_i}.dist)}^2}}}{{2{\sigma _d}^2}}}}
+\end{equation}
+where $\sigma _d$ is the standard deviation of the measured displacement. Based on the distance calculation method of PDR, the displacement is in direction proportion to step length. Therefore, $\sigma _d$ can be obtained based on the standard deviation of step length. Considering the situation that a pedestrian is walking on the road segment, all long enough candidate road segments should have the same probability, AiFiMatch models the situation using a formula as:
+\begin{equation}
+{f_2}({\rm{z}}{\rm{.dist(t),}}{{\rm{s}}_{\rm{i}}}{\rm{.dist}}) = \frac{1}{{\sqrt {2\pi } {\sigma _d}}}{e^{-4.5}},z.dist(t) + 3{\sigma _d} \le {s_i}.dist
+\end{equation}
+Hence, the final emission probability, $p(z|s_i)$, is modeled as:
+\begin{equation}
+p(z|s_i)=f(z.dist,{s_i}.dist) = \left\{ {\begin{array}{*{20}{l}}
+	{\frac{1}{{\sqrt {2\pi } {\sigma _d}}}{e^{-4.5}},z.dist + 3{\sigma _d} \le {s_i}.dist}\\
+	{\frac{1}{{\sqrt {2\pi } {\sigma _d}}}{e^{ - \frac{{{{(z.dist - {s_i}.dist)}^2}}}{{2{\sigma _d}^2}}}},otherwise}
+	\end{array}} \right.
+\end{equation}
+
+5) $\pi  = \left\{ {{\pi _i}} \right\}$ is the initial state distribution, where ${\pi _i} = p\left\{ {{q_1} = {S_i}} \right\},1 \le i \le N$. If the starting point or the first road segment is known, the initial state distribution is $1$ since the first road segment is the only candidate; otherwise, all candidate road segments are selected by the \emph{Candidate Extraction} module and the initial state distribution is uniform in all candidates. Let $S_c$ denote the set of all candidates, and the initial state distribution is re-estimated after each step by formula \ref{equ_initupdate} until the first location-related activity is detected.
+\begin{equation}
+\label{equ_initupdate}
+{\pi _{i,t}} = {\pi _{i,t - 1}} \cdot f(z.dist(t),{s_i}.dist),{s_i} \in {S_c}
+\end{equation}
+
+\subsection{Candidate Extraction}
+
+AiFiMatch uses the heading direction of a pedestrian and Wi-Fi fingerprint to select the candidate states. Here, we describe the extraction algorithm by heading direction and leave the Wi-Fi fingerprint extraction algorithm to the \emph{Wi-Fi Enhancement} Section.
+
+Intuitively, the heading direction of a pedestrian should match the direction of road segment. Therefore, AiFiMatch models the direction difference by the following function to select the candidates:
+\begin{equation}
+{g_1} = {g_1}({Ped_{dir}},s) = \left\{ {\begin{array}{*{20}{l}}
+	{1,if\left| {{Ped_{dir}} - s.{d_j}} \right| < H_{TH},j = 1,2}\\
+	{0,otherwise}
+	\end{array}} \right.
+\end{equation}
+where $Ped_{dir}$ denotes the heading direction of a pedestrian, $s$ is a state, $H_{TH}$ is the threshold for candidate extraction, which is set to $55^\circ$ based on the experiments.
+
+\subsection{Optimal State Sequence Estimation}
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=2.8in]{AiFiMatch-Viterbi}
+	\caption{Illustration of the Viterbi Decoding.}
+	\label{fig-viterbi}
+\end{figure}
+
+For AiFiMatch to operate in real-time, it cannot wait until the whole sequence is available. Hence, in an incremental manner, AiFiMatch users a sliding window on the Map Matching module. Every time a new step of a pedestrian is detected, the HMM parameters are calculated for the new introduced sensors data and the associated candidate states. The online Viterbi algorithm \cite{bloit2008short} is then applied to compute the maximum likelihood sequence of states for the current window using dynamic programming. Fig. \ref{fig-viterbi} illustrates the proposed HMM model Viterbi decoding. The sliding window size is $3$ and the decoded sequence is colored in blue. The initial states probability is also updated as the sliding window moves.
+
+Once the HMM parameters are estimated, we can user the Viterbi algorithm to get the most probable hidden states sequence for a given observation sequence. During the beginning process of the algorithm, if the number of states is too small, the most probable states sequence is not always the correct one, especially when the starting point of pedestrian is unknown. Therefore, we give a criteria by formula $c = {{{p_{fir}}} \mathord{\left/
+		{\vphantom {{{p_{fir}}} {{p_{\sec }}}}} \right.
+		\kern-\nulldelimiterspace} {{p_{\sec }}}}$ to determine the status of this algorithm, where ${p_{fir}}$ is the highest probability of the states sequence and ${p_{\sec }}$ is the second highest probability of the states sequence. We set a threshold, if $c$ is greater than or equal to the threshold, we choose the Viterbi decoding result. The selected hidden states sequence represents the pedestrian's passed indoor road segments.
+
+\subsection{Wi-Fi Enhancement}
+Map matching offers an important source of information and an excellent way to improve the position estimations, especially in narrow corridors, but it has some limitations when the indoor environment presents symmetries that generates multiple hypotheses. Supposing that a pedestrian walks along this segments sequence $(s_3, s_4, s_5, s_6)$, as shown in Fig. \ref{fig-viterbi}, for the given observable states, it is directly to be seen that the segments sequence $(s_6, s_7, s_8, s_9)$ may have almost the same matching probability as the actual one. In this situation, traditional HMM based map matching algorithm fails \cite{zhou2015activity}.
+
+AiFiMatch introduces Wi-Fi dissimilarity to distinguish multiple hypotheses due to the symmetry of building structure. After AiFiMatch determines a pedestrian's walking trajectory by the Online Viterbi Algorithm, the pedestrian's positions can be derived by PDR using the two endpoints of determined segments as the starting point. Therefore, Wi-Fi fingerprints collected synchronously during the pedestrian walking can be bound to the corresponding positions by time alignment and then update the Wi-Fi fingerprint database of indoor environment where the pedestrian is located. In order to improve the HMM based map matching algorithm described above, the paper not only binds Wi-Fi fingerprints to physical positions but also road segments. All Wi-Fi fingerprints of one road segment are sorted in the road segment's direction. For two fingerprints $f_x$, $f_y$, and MAC address set of their Access Points $X$, $Y$, define dissimilarity $J_{\delta}$ between $f_x,f_y$ as follows:
+\begin{equation}
+{J_\delta }(f_x,f_y) = 1 - J(X,Y) = \frac{{|X \cup Y| - |X \cap Y|}}{{|X \cup Y|}}
+\label{equ-jad}
+\end{equation}
+where Equation \ref{equ-jad} is known as Jaccard distance. With this dissimilarity of two fingerprints, we define the similarity function $L(S_a, S_b)$ between two fingerprint sequences $S_a = (f_1^a,f_2^a,\cdots,f_w^a)$, $S_b = (f_1^b, f_2^b, \cdots, f_k^b)$:
+\begin{equation}
+\begin{array}{c}
+L({S_a},{\rm{ }}{S_b}) = \min (\frac{1}{w}\sum\limits_{t = 1}^w {{J_\delta }({f_t}^a,{f_{i + t}}^b),0 \le i \le k - w,} \\
+\frac{1}{w}\sum\limits_{t = 1}^w {{J_\delta }({f_t}^a,{f_{j - t}}^b),w + 1 \le j \le k + 1} )
+\end{array}
+\end{equation}
+where $w=|S_a|$, $k=|S_b|$ and $2<w<k$. Given segment candidate set $G$ and the set $R$ of all road segments bound with Wi-Fi fingerprints sequence, Finally, AiFiMatch models the dissimilarity of two Wi-Fi fingerprint sequences and the different stages of fingerprint database by the following function to select the candidates: 
+\begin{equation}
+{g_2}({S_{ped,}}{S_i}) = \left\{ {\begin{array}{*{20}{l}}
+	{0,if{\kern 1pt} i{\kern 1pt}  \ne \mathop {\arg \min }\limits_j \{ L({S_{ped,}}{S_j}),{S_j} \in G,G \subseteq R\} }\\
+	{0,if{\kern 1pt} \min \{ L({S_{ped}},{S_i}),{\kern 1pt} {\kern 1pt} {S_i} \in G{\kern 1pt} {\kern 1pt}  \cap R\}  > d{\kern 1pt} {\kern 1pt} }\\
+	{1,otherwise}
+	\end{array}} \right.
+\end{equation}
+where $d$ is the threshold to distinguish two Wi-Fi fingerprint sequences. A pilot study is conducted to evaluate the dissimilarities between two fingerprint sequences of same and different road segments and the experimental result is shown in Fig. \ref{fig-wifidist}. In the paper, $d$ is set to $0.63$ based on the experiment. 
+
+\begin{figure}[!htbp]
+	\centering
+		\includegraphics[width=2.58in]{AiFiMatch-WiFiDist}
+		\caption{Dissimilarity of Two Wi-Fi Fingerprint Sequences.}
+	\label{fig-wifidist}
+\end{figure}
+
+\section{Evaluation}
+
+\subsection{Environment Setup}
+
+In this section, we show our evaluation for the performance of AiFiMatch in real-world environment, we conducted experiments in the fifth floor of a teaching hall on campus. Approximately, we covered a $78.95m \times 56.40m$ floor plan, as shown in Fig. \ref{fig-envionment}. A prototype is implemented on an Android version 6.0.1 Xiaomi III smartphone. The prototype samples the accelerometer, gyroscope and magnetometer sensors at $50$Hz and Wi-Fi at $1$Hz. Three participants (two males and one female) were asked to complete the experiments. The participants were asked to walking along Trajectory $No.1$ ($T_1$), Trajectory $No.2$ ($T_2$) and Trajectory $No.3$ ($T_3$) in a constant speed. Each trajectory was repeated six times by all participants. In order to record the walking trajectories, all the participants' shoes were painted with colored powder. This offered the ground truth.
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=2.48in]{AiFiMatch-Environment}
+	\caption{Experiment Environments and Trajectories.}
+	\label{fig-envionment}
+\end{figure}
+
+\subsection{Performance of Map Matching}
+
+To evaluate AiFiMatch map matching performance, we start by showing the online positioning performance of AiFiMatch and basic PDR technique. Then, we discussed the convergence performance as compared to an activity sequence-based map matching algorithm proposed by \emph{Zhou et al} \cite{zhou2015activity}. Finally, we show the offline positioning results when using AiFiMatch.
+
+\subsubsection{Online Positioning Performance}
+
+Euclidean distance between the estimated position and the ground truth is introduced to indicate positioning accuracy.  Fig. \ref{fig-online} shows the online positioning results of all trajectories for basic PDR algorithm with known initial point and AiFiMatch without known initial point.  Here, the mean position of all segment candidates' starting point is taken as initial point of AiFiMatch algorithm. Generally, for one trajectory, the greater the traveled distance, the larger the positioning error of PDR due to cumulative errors, Fig. \ref{fig-online} shows the trend.  However, after passing a number of steps, the traveled segment sequence determined by AiFiMatch even without known the initial point and the cumulative  errors are eliminated successfully.
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=2.8in]{AiFiMatch-OnlinePosition}
+	\caption{Online positioning results for Each Trajectory.}
+	\label{fig-online}
+\end{figure}
+
+\subsubsection{Convergence Speed}
+
+We compare the performance of AiFiMatch algorithm in terms of convergence to map matching algorithm proposed by \emph{Zhou et al}. Distance traveled before converging to a unique states sequence reflects the convergence speed. The greater the traveled distance, the slower is the convergence speed. Fig. \ref{fig-converg} shows the traveled distance before convergence for \emph{Zhou et al}, AiFiMatch without Wi-Fi enhancement and AiFiMatch with Wi-Fi enhancement. At the initial stage, fingerprint database is empty ($T_1$), AiFiMatch and \emph{Zhou et al.} both successfully converge even without known the initial point. AiFiMatch without Wi-Fi enhancement and map matching algorithm proposed by \emph{Zhou et al.} fail to converge ($\infty$ means $T_2$ cannot be converged.) due to the symmetry of building structure. However, with the help of Wi-Fi signal, $T_2$ reaches convergence quickly. Mostly, with Wi-Fi enhancement, the traveled distance is much shorter than without Wi-Fi enhancement($T_2, T_3$). 
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=2.4in]{AiFiMatch-Convergence}
+	\caption{Distance Traveled before Convergence for Each Trajectory.}
+	\label{fig-converg}
+\end{figure}
+
+\subsubsection{Offline Positioning Performance}
+
+The offline positioning results are derived retrospectively after matching the walking trajectory of a pedestrian to a unique road segments sequence by AiFiMatch. Fig. \ref{fig-envandoffline} shows the tracking trajectories and some details are summarized in Table 2. AiFiMatch system tracked pedestrians' trajectories accurately in the experiment environments and the mean error of the offline positioning is about $1.24$ m.
+
+\begin{figure}[!ht]
+	\centering
+	\subfloat[$T_1\ Offline\ Positioning\ Results$]{\includegraphics[width=2.282in]{AiFiMatch-OfflineTraject1}%
+		\label{fig-offlineT1}}
+	\vfil
+	\subfloat[$T_2\ Offline\ Positioning\ Results$]{\includegraphics[width=2.3in]{AiFiMatch-OfflineTraject2}%
+		\label{fig-offlineT2}}
+	\vfil
+	\subfloat[$T_3\ Offline\ Positioning\ Results$]{\includegraphics[width=2.3in]{AiFiMatch-OfflineTraject3}%
+		\label{fig-offlineT3}}
+	\caption{ Environment Setup and Offline Positioning Results for Each Trajectory}
+	\label{fig-envandoffline}
+\end{figure}
+
+\begin{table*}
+	\newcommand{\tabincell}[2]{\begin{tabular}{@{}#1@{}}#2\end{tabular}}
+	\label{tab-offline}
+	\caption{Evaluation Results}
+	\begin{center}
+		\begin{tabular}{|c || c | c | c | c | c | c |}
+			\hline
+			\bfseries \tabincell{c}{Trajectory\\ No.}  & \bfseries Length (m) & \bfseries \tabincell{c}{Mean\\ Error (m)} & \bfseries \tabincell{c}{Step\\ Number} &  \bfseries \tabincell{c}{Detected\\ Step} & \bfseries \tabincell{c}{Activity\\ Number} & \bfseries \tabincell{c}{Detected\\ Activity} \\
+			\hline\hline
+			\bfseries 1 & 176.1 & 1.09 & 238 & \bfseries 240 & 5 & 5 \\
+			\hline
+			\bfseries 2 & 84.6 & 1.65 & 114 & 114 & 3 & 3  \\
+			\hline
+			\bfseries 3 & 175.9 & 1.19 & 228 & \bfseries 227 & 5 & 5  \\
+			\hline
+		\end{tabular}
+	\end{center}
+\end{table*}
+
+\section{Related Work}
+
+\subsection{SLAM algorithm}
+The SLAM algorithm was originally introduced in robotics for navigation of autonomous agents in unknown environments. It has been applied recently in indoor pedestrain tracking systems. Wi-Fi SLAM builds a landmark map of the Wi-Fi RSS based on a Gaussian Process Latent Variable Model (GP-LVM). Similarly, ActionSLAM combines dead-reckoning based on special foot-mounted inertial sensors with observations of location-related actions. SemanticSLAM generalizes the SLAM concept to work with landmarks that can be sensed by the phone sensors.
+
+\subsection{Map Assisted Localization}
+For pedestrian localization system, indoor map can bring constraints for the user's trajectory. Woodman and Harle proposed a localization approach based on MM using particle filter, which is entirely self-contained and does not rely on infrastructure. In [43], indoor map is used to filter out infeasible locations over time. In [x], a HMM model is used to match the activity sequence of smartphone user to the corresponding landmarks of indoor map. 
+
+\subsection{Map Assisted Localization}
+For pedestrian localization system, indoor map can bring constraints for the user's trajectory. Woodman and Harle proposed a localization approach based on MM using particle filter, which is entirely self-contained and does not rely on infrastructure. In [43], indoor map is used to filter out infeasible locations over time. In [x], a HMM model is used to match the activity sequence of smartphone user to the corresponding landmarks of indoor map.
+
+\section{Conclusion}
+
+This paper proposed AiFiMatch: a novel map matching Algorithm based on activity detection and crowd-sourced Wi-Fi for indoor pedestrian tracking and positioning. AiFiMatch leverages the smartphone's motion sensors to detect different activities using a decision tree and then divides the walking trajectory into trajectory subset sequence. The HMM model is used to match walking trajectory subset sequence to road segments sequence.  AiFiMatch can also construct and update fingerprint database based on road segment by crowd-sourcing. We provided the AiFiMatch's system architecture and presented the details of different modules. The performance of AiFiMatch has been evaluated by experiments in a building on campus. The results show that AiFiMatch can track pedestrian's trajectory accurately even without known initial point. In addition, with the help of Wi-Fi fingerprints, AiFiMatch reaches converge quickly and effectively solves the multiple hypotheses caused by symmetry of building structure. 
 
 %\section*{Acknowledgment}
 %
