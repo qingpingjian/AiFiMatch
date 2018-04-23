@@ -80,23 +80,27 @@ Map Matching, Hidden Markov Model, Activity Detection, Crowdsourced Wi-Fi
 
 Location based services (LBS) have spilled over into all aspects of people's daily life. Outdoors, global positioning system (GPS) is able to provide a reasonably good positioning \cite{zampella2015indoor}. However, robust and effective indoor pedestrian positioning is still at its infancy due to the blockage of GPS signals.
 
-It is common for indoor positioning schemes to leverage on pre-installed infrastructure like Wi-Fi, UWB, RFID, Bluetooth, and so on \cite{bahl2000enhancements,ni2004landmarc}. These systems offer absolute positioning with a limited error level,but rely on expensive hardware or time-consuming pre-training. At present, motion sensors, including accelerometer, gyroscope and magnetometer, are widely used in smartphones. Therefore, dead reckoning (DR) techniques using motion sensors are another way for indoor positioning, which derive the current position by adding the estimated displacement to the previous one. DR techniques are known as  pedestrian dead reckoning (PDR) for pedestrian tracking and positioning \cite{zhou2015activity,zhou2015alimc}. The PDR technique itself does not provide a final solution to the pedestrian positioning problem and another technique is required to provide the initial position estimates.
+It is common for indoor positioning schemes to leverage on pre-installed infrastructure like Wi-Fi\cite{bahl2000enhancements}, UWB\cite{Fontana2002}, RFID\cite{ni2004landmarc}, Bluetooth\cite{zafari2015enhancing}, and so on. These systems offer absolute positioning with a limited error level,but rely on expensive hardware or time-consuming pre-training. At present, motion sensors, including accelerometer, gyroscope and magnetometer, are widely used in smartphones. Therefore, dead reckoning (DR) techniques using motion sensors are another way for indoor positioning, which derive the current position by adding the estimated displacement to the previous one. DR techniques are known as  pedestrian dead reckoning (PDR) for pedestrian tracking and positioning \cite{fu2017crowdsourcing,alaoui2017points,zhou2015activity}. The PDR technique itself does not provide a final solution to the pedestrian positioning problem and another technique is required to provide the initial position estimates.
 
-The positioning error of PDR technique mainly comes from step length and direction estimation errors and even small errors will be magnified by cumulation over time. Indoor map information may be connected with PDR, namely map matching algorithm \cite{aly2015semmatch}. Several map matching algorithms have been proposed to constrain the cumulative errors \cite{zampella2015indoor,zhou2015activity,abdelnasser2016semanticslam,fu2017crowdsourcing}.  One algorithm uses activity-related locations as virtual landmarks to find the optimal trajectory of a pedestrian. The activity-related locations are special locations of a building, such as an elevator, a stair, a corner, and so on. When a pedestrian passes these locations, the pedestrian's activities can be distinguished from normal walking. Human activity detection (AD) algorithms based on smartphones have attracted more and more researchers' attention in the past decade. Given the symmetry of indoor environment, activity-based map matching algorithms fails since there may be more than one alternatives for the same activity feature or activity sequence \cite{zhou2015activity}.
+The positioning error of PDR technique mainly comes from step length and direction estimation errors and even small errors will be magnified by cumulation over time. Indoor map information may be connected with PDR, namely map matching algorithm \cite{aly2015semmatch}. Several map matching algorithms have been proposed to constrain the cumulative errors \cite{zhou2015activity,aly2015semmatch,zhou2015alimc,abdelnasser2016semanticslam,qiu2017iframe}.  One algorithm uses activity-related locations as virtual landmarks to find the optimal trajectory of a pedestrian. The activity-related locations are special locations of a building, such as an elevator, a stair, a corner, and so on. When a pedestrian passes these locations, the pedestrian's activities can be distinguished from normal walking. Human activity detection (AD) algorithms based on smartphones have attracted more and more researchers' attention in the past decade. Given the symmetry of indoor environment, activity-based map matching algorithms fails since there may be more than one alternatives for the same activity feature or activity sequence \cite{zhou2015activity}.
 
-Crowdsourcing is a low-cost and efficient way to extract useful information from data acquired by crowd participants. The crowdsourcing method has been successfully applied to construct Wi-Fi fingerprint database \cite{zhang2014robust}. At present, Wi-Fi access points (AP) have been widely developed in public buildings. It is feasible to introduce Wi-Fi signal feature into map matching algorithms \cite{newson2009hidden, seitz2010hidden}. Therefore this paper proposed AiFiMatch: a novel hidden markov model (HMM) based map matching algorithm, which integrates activity-based map matching and crowdsourced Wi-Fi. The fundamental idea of this algorithm is that smartphones can simultaneously collect motion sensors data and Wi-Fi received signal strength (RSS) values as pedestrians walking. Wi-Fi RSS can be a new feature to eliminate the symmetry of indoor environments and reduce the number of candidate hidden states in our HMM model. Thus, AiFiMatch can get the pedestrian's position estimations within a short time delay. 
+Crowdsourcing is a low-cost and efficient way to extract useful information from data acquired by crowd participants \cite{wang2016indoor}. The crowdsourcing method has been successfully applied to construct Wi-Fi fingerprint database \cite{zhang2014robust,xiang2017tack}. At present, Wi-Fi access points (AP) have been widely developed in public buildings. It is feasible to introduce Wi-Fi signal feature into map matching algorithms \cite{newson2009hidden, seitz2010hidden}. Therefore this paper proposed AiFiMatch: a novel hidden markov model (HMM) based map matching algorithm, which integrates activity-based map matching and crowdsourced Wi-Fi. The fundamental idea of this algorithm is that smartphones can simultaneously collect motion sensors data and Wi-Fi received signal strength (RSS) values as pedestrians walking. Wi-Fi RSS can be a new feature to eliminate the symmetry of indoor environments and reduce the number of candidate hidden states in our HMM model. Thus, AiFiMatch can get the pedestrian's position estimations within a short time delay.  In summary, this paper's mainly contributions are:
 
-The remainder of this paper is organized as follows: Section II gives an overview of the AiFiMatch system and its preprocessing components. Then, we detail the proposed HMM-based map matching algorithm in Section III. Section IV shows the experimental results and analysis of the AiFiMatch system. Finally, Section V and Section VI review related work and conclude this paper, respectively.
+
+
+The remainder of this paper is organized as follows: Section II reviews the related work. Section III gives an overview of the AiFiMatch system and its preprocessing components. Then, we detail the proposed HMM-based map matching algorithm in Section IV. Section V shows the experimental results and analysis of the AiFiMatch system. Finally, Section VI concludes this paper.
 
 \section{Related Work}
 
-\subsection{SLAM algorithm}
-The SLAM algorithm was originally introduced in robotics for navigation of autonomous agents in unknown environments. It has been applied recently in indoor pedestrain tracking systems. Wi-Fi SLAM builds a landmark map of the Wi-Fi RSS based on a Gaussian Process Latent Variable Model (GP-LVM). Similarly, ActionSLAM combines dead-reckoning based on special foot-mounted inertial sensors with observations of location-related actions. SemanticSLAM generalizes the SLAM concept to work with landmarks that can be sensed by the phone sensors.
+
 
 \subsection{Map Assisted Localization}
+The SLAM algorithm was originally introduced in robotics for navigation of autonomous agents in unknown environments. It has been applied recently in indoor pedestrain tracking systems. Wi-Fi SLAM builds a landmark map of the Wi-Fi RSS based on a Gaussian Process Latent Variable Model (GP-LVM). Similarly, ActionSLAM combines dead-reckoning based on special foot-mounted inertial sensors with observations of location-related actions. SemanticSLAM generalizes the SLAM concept to work with landmarks that can be sensed by the phone sensors\cite{xiao2014lightweight}.
+
+\subsection{Activity Detection based PDR}
 For pedestrian localization system, indoor map can bring constraints for the user's trajectory. Woodman and Harle proposed a localization approach based on MM using particle filter, which is entirely self-contained and does not rely on infrastructure. In [43], indoor map is used to filter out infeasible locations over time. In [x], a HMM model is used to match the activity sequence of smartphone user to the corresponding landmarks of indoor map. 
 
-\subsection{Map Assisted Localization}
+\subsection{Combination of PDR and Wi-Fi Fingerprint}
 For pedestrian localization system, indoor map can bring constraints for the user's trajectory. Woodman and Harle proposed a localization approach based on MM using particle filter, which is entirely self-contained and does not rely on infrastructure. In [43], indoor map is used to filter out infeasible locations over time. In [x], a HMM model is used to match the activity sequence of smartphone user to the corresponding landmarks of indoor map.
 
 \section{AiFiMatch Overview}
@@ -104,9 +108,10 @@ For pedestrian localization system, indoor map can bring constraints for the use
 AiFiMatch is an activity-based map matching system to pedestrian dead reckoning problem. In this section, we first provide an overview of the AiFiMatch system and then describe the details of its preprocessing components including PDR implementation based on smartphone, activity detection and indoor floor plan abstraction. We leave the details of the core of AiFiMatch system, the HMM based map matching module, to the next section.
 
 \begin{figure*}[htbp]
-	\centerline{\includegraphics[width=5.85in]{AiFiMatch-Architecture}}
+	\centerline{\includegraphics[width=5.235in]{AiFiMatch-Architecture}}
 	\caption{AiFiMatch System Architecture.}
 	\label{fig-architecture}
+	\vspace{-5pt}
 \end{figure*}
 
 \subsection{Architecture Overview}
@@ -126,7 +131,13 @@ In the balance of this section, we give the details of three preprocessing compo
 PDR is a positioning scheme that derives the current position by adding the estimated displacement to the previous one based on motion sensors carried by smartphones. In PDR scheme, the pedestrian's position is usually updated by the step and the heading direction during one step is supposed to be unchanged. The pedestrian's position after $k-1$ steps can be denoted as $(x_{k-1},y_{k-1})$. The $k$-th step length and heading direction are denoted as $sl_k$ and $\theta_k$, respectively. Then, the pedestrian's position after $k$ steps can be obtained by the following formula:
 \begin{equation}
 	\label{equ_pdr}
-	({x_k},{y_k}) = ({x_{k - 1}} + s{l_k} \cdot sin{\theta _k},{y_{k - 1}} + s{l_k} \cdot \cos {\theta _k})
+	\left( {\begin{array}{*{20}{c}}
+		{{x_k}}\\
+		{{y_k}}
+		\end{array}} \right){\rm{ = }}\left( {\begin{array}{*{20}{c}}
+		{{x_{k - 1}} + s{l_k} \cdot \sin {\theta _k}}\\
+		{{y_{k - 1}} + s{l_k} \cdot \cos {\theta _k}}
+		\end{array}} \right)
 \end{equation}
 
 The heading direction is measured by the fusion of gyroscope and magnetometer. The step length and step count estimate approach is out of scope of this paper and can be found in \cite{wang2012no}.
@@ -134,11 +145,12 @@ The heading direction is measured by the fusion of gyroscope and magnetometer. T
 \subsubsection{Activity Detection}
 
 \begin{figure}[!ht]
+	\vspace{-10pt}
 	\centering
-	\subfloat[$Decision\ Tree\ for\ Activity\ Detection$]{\includegraphics[width=3.15in]{AiFiMatch-ActivityDecision}%
+	\subfloat[$Decision\ Tree\ for\ Activity\ Detection.$]{\includegraphics[width=3.15in]{AiFiMatch-ActivityDecision}%
 		\label{fig-activity}}
 	\vfil
-	\subfloat[$Activity\ Detected\ Example$]{\includegraphics[width=3.15in]{AiFiMatch-TurnDemo}%
+	\subfloat[$Activity\ Detected\ Example.$]{\includegraphics[width=2.875in]{AiFiMatch-TurnDemo}%
 		\label{fig-turndemo}}
 	\caption{Decision Tree for Activity Detection and An Example}
 \end{figure}
@@ -161,7 +173,7 @@ The heading direction is measured by the fusion of gyroscope and magnetometer. T
 	\end{center}
 \end{table}
 
-In this paper, AiFiMatch considers four types of pedestrian activities: stationary, normal walking, turning at a corner (left or right turn) and turning around (U-turn), which would occur on the flat ground. The decision tree for activity detection and signal features of each activity is shown in Fig. \ref{fig-activity}. The top level separates walking and stationary based on the variance of the accelerometer. With the help of gyroscope, the second level uses the rotation rate to separate the normal walking and turns while the third level separates the U-turn case from the left or right turn case based on the rotation angle during the turning. Three participants with smartphones were asked to complete three activities (U-turn, left and right turn) in our experimental environment. The sample size of each activity was $60$ traces. Fig. \ref{fig-turndemo} shows an example for activity detection and the activity detection result is summarized in Table \ref{tab_conf}.
+In this paper, AiFiMatch considers four types of pedestrian activities: stationary, normal walking, turning at a corner (left or right turn) and turning around (U-turn), which would occur on the flat ground. The decision tree for activity detection and signal features of each activity is shown in Fig. \ref{fig-activity}. The top level separates walking and stationary based on the variance of the accelerometer. With the help of gyroscope, the second level uses the rotation rate to separate the normal walking and turns while the third level separates the U-turn case from the left or right turn case based on the rotation angle during the turning. Three participants with smartphones were asked to complete three activities (U-turn, left and right turn) in our experimental environment. The sample size of each activity was $60$ traces. Fig. \ref{fig-turndemo} shows an example for activity detection and the activity detection result is summarized in Table I.
 
 \subsubsection{Indoor Floor Plan Abstraction}
 
