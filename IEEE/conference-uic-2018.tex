@@ -133,15 +133,15 @@ The heading direction is measured by the fusion of gyroscope and magnetometer. T
 
 \subsubsection{Activity Detection}
 
-\begin{figure*}[!ht]
+\begin{figure}[!ht]
 	\centering
-	\subfloat[$Decision\ Tree\ for\ Activity\ Detection$]{\includegraphics[width=4.75in]{AiFiMatch-ActivityDecision}%
+	\subfloat[$Decision\ Tree\ for\ Activity\ Detection$]{\includegraphics[width=3.15in]{AiFiMatch-ActivityDecision}%
 		\label{fig-activity}}
 	\vfil
-	\subfloat[$Activity\ Detected\ Example$]{\includegraphics[width=4.85in]{AiFiMatch-TurnDemo}%
+	\subfloat[$Activity\ Detected\ Example$]{\includegraphics[width=3.15in]{AiFiMatch-TurnDemo}%
 		\label{fig-turndemo}}
 	\caption{Decision Tree for Activity Detection and An Example}
-\end{figure*}
+\end{figure}
 
 \begin{table}
 	\label{tab_conf}
@@ -296,32 +296,61 @@ where $d$ is the threshold to distinguish two Wi-Fi fingerprint sequences. A pil
 \subsection{Algorithm}
 
 \begin{algorithm}[H]
-	\caption{AiFiMatch map matching algorithm}
+	\caption{AiFiMatch online map matching algorithm}
 	\label{alg_aifi}
 	\begin{algorithmic}[1]
 		\renewcommand{\algorithmicrequire}{\textbf{Input:}}
 		\renewcommand{\algorithmicensure}{\textbf{Output:}}
-		\REQUIRE Sensor data until current time t: $data_{0:t}$
-		\REQUIRE Abstract indoor floor plan: $fp$
-		\REQUIRE Corresponding RSS Values: $r_{0:n}$
-		\REQUIRE Locations and Path Loss Exponents of known APs: $L_{ap}^i,{\mu ^i}$
-		\ENSURE Path Loss Exponent: ${\hat \mu }$
-		\ENSURE Position Estimation at current time $t$: ${\hat q}_{t}$	
-		\STATE Let $k$ be the length of the pedestrian's walking trajectory subset sequence
-		\STATE $S_e,R_e,S_v,R_v=divideTwo(s_{0:n},r_{0:n})$
-		\STATE $errorDist_{last} \leftarrow \alpha\ //\alpha\ is\ a\ large\ enough\ value$
-		\FOR{$\mu=2.0\ to\ 5.0\ step\ 0.05$}
-		\STATE $L_{ap}=multi\_trilateration(\mu,S_e,R_e,L_{ap}^i,{\mu ^i})$
-		\STATE ${\bar S}_v=multi\_trilateration(\mu,L_{ap},R_v)$
-		\STATE $errorDist=meanDistance(S_v,{\bar S}_v)$
-		\IF{$errorDist\ >\ errorDist_{last}$}
-		\STATE break
+		\REQUIRE Sensor data up to current time t: $data_{0:t}$
+		\REQUIRE Abstract Indoor Floor Plan: $fp$
+		\REQUIRE Length of state sequence up to last time $t-1$: $k$
+		\REQUIRE State Sequence up to last time $t-1$: $S_{k}(t-1)$
+		\REQUIRE Array of Viterbi variable and backward pointer: ${VtbArr}_{k}(t-1)$
+		\ENSURE Pedestrian's position estimation at current time $t$: $Ped_{loc}(t)$
+		\ENSURE Optimal state sequence estimation at current time $t$: $Q(t)$
+		\STATE ${Ped_{AT}(t)}, at \leftarrow activity\_detect({data_{0:t}})$
+		\IF{$Ped_{AT}(t)\ != \ None$}  
+		    \STATE ${st} \leftarrow {at}$  
+		    
+		    \STATE // Calculate the transition probability
+		    \STATE $S(t) \leftarrow [\ ]$
+		    \FOR{$s_i\ in\ S_{k}(t-1)$}
+			    \STATE // Select next segments according to $fp$
+			    \STATE $S^{i}(t) \leftarrow next(fp,s_i)$
+			    \STATE // Extract segments according to Wi-Fi data
+			    \STATE $S^{i,wifi}(t) \leftarrow extract(data_{st:t}^{wifi},S^{i}(t))$
+			    \FOR{$s_j\ in\ S^{i,wifi}(t)$}
+			        \STATE $tr[i][j] \leftarrow p(s_j|s_i,{Ped_{AT}(t)})$
+			    \ENDFOR
+			    \STATE $S(t).extend(S^{i,wifi}(t))$
+		    \ENDFOR
+		    
+		    \STATE // Calculate the observation probability		    
+		    \STATE ${z_t} \leftarrow dead\_reckon(data_{st:t})$
+		    \FOR{$s_i\ in\ S(t)$}
+		    \STATE $ob[i]\ \leftarrow\ p(z_t|s_i)$
+		    \ENDFOR
+		    \STATE ${VtbArr}_{k+1}(t) \leftarrow viterbi({VtbArr}_{k}(t-1), ob[\ ], tr[\ ][\ ])$
+		    \STATE $k \leftarrow k+1$
+		    \STATE $S_{k}(t) \leftarrow S(t)$
+		\ELSE
+		    \STATE $ob \leftarrow [\ ],\ S_{k}(t) \leftarrow S_{k}(t-1)$
+		    \STATE // Update the observation probability
+		    \STATE ${z_t}=dead\_reckon(data_{st:t})$
+		    \FOR{$s_i\ in\ S_{k}(t)$}
+		        \STATE $ob[i]\ \leftarrow\ p(z_t|s_i)$
+		    \ENDFOR
+		    \STATE ${VtbArr}_{k}(t) \leftarrow viterbi({VtbArr}_{k}(t-1), ob[\ ])$
+		\ENDIF	
+		
+		\STATE // Optimal State Sequence
+		\STATE ${Q(t)} \leftarrow None$
+		\IF{$check\_status(VtbArr^{k}(t))=Convergence$}
+		    \STATE ${Q(t)} \leftarrow viterbi\_decode(VtbArr^{k}(t))$
 		\ENDIF
-		\STATE $errorDist_{last} \leftarrow errorDist$
-		\STATE ${\hat \mu } \leftarrow \mu$
-		\STATE ${\hat L}_{ap} \leftarrow L_{ap}$
-		\ENDFOR
-		\RETURN ${\hat \mu },{\hat L}_{ap}$
+		
+		\STATE // Update the location estimation according to $Q(t)$
+		\STATE $Ped_{loc}(t) \leftarrow update\_location(data_{st:t}, Q(t))$
 	\end{algorithmic}
 \end{algorithm}
 
