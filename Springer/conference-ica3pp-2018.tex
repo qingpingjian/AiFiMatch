@@ -3,8 +3,8 @@
 % for Lecture Notes in Computer Science,
 % version 2.4 for LaTeX2e as of 16. April 2010
 %
-%\documentclass{llncs}
-\documentclass[runningheads]{llncs}
+\documentclass{llncs}
+%\documentclass[runningheads]{llncs}
 
 % *** GRAPHICS RELATED PACKAGES ***
 \usepackage{graphicx}
@@ -233,7 +233,7 @@ Taking computing power and energy limit of a smartphone into account, our propos
 p({s_{j,t}}|{s_{i,t - 1}}) = p({s_j}|{s_i},{Ped_{AT}}(t)) = p({Ped_{AT}}(t)|{Seg_{AT}}^{ij})
 \end{equation}
 
-4) $B = \left\{ {{b_i}(k)} \right\}$ is the observation probability distribution in state $i$, where ${b_i}(k) = p\{ {z_t} = {v_k}|{q_t} = {s_i}\},1 \le i \le N,1 \le k \le M$ and $z_t$ and $q_t$ are the observation and state at time $t$, respectively. Observation probabilities also called emission probabilities represent the likelihood that a measurement resulted from a given state. In our case, given a displacement observation $z.dist(t)$, there is an emission probability $p(z.dist(t)|{s_i}.dist$ for each candidate road segment $s_i$. If a pedestrian has passed the complete road segment $s_i$, AiFiMatch models the emission probability as a Gaussian Distribution:
+4) $B = \left\{ {{b_i}(k)} \right\}$ is the observation probability distribution in state $i$, where ${b_i}(k) = p\{ {z_t} = {v_k}|{q_t} = {s_i}\},1 \le i \le N,1 \le k \le M$ and $z_t$ and $q_t$ are the observation and state at time $t$, respectively. Observation probabilities also called emission probabilities represent the likelihood that a measurement resulted from a given state. In our case, given a displacement observation $z.dist(t)$, there is an emission probability $p(z.dist(t)|{s_i}.dist$ for each candidate road segment $s_i$, where ${s_i}.dist$ denotes the length of road segment $s_i$. If a pedestrian has passed the complete road segment $s_i$, AiFiMatch models the emission probability as a Gaussian Distribution:
 \begin{equation}
 \label{equ_emission1}
 {f_1}({\rm{z}}{\rm{.dist(t),}}{{\rm{s}}_{\rm{i}}}{\rm{.dist}}) = \frac{1}{{\sqrt {2\pi } {\sigma _d}}}{e^{ - \frac{{{{(z.dist(t) - {s_i}.dist)}^2}}}{{2{\sigma _d}^2}}}}
@@ -397,7 +397,7 @@ AiFiMatch algorithm is summarized with the pseudocode in Algorithm \ref{alg_aifi
 
 \subsection{Environment Setup}
 
-In this section, we show our evaluation for the performance of AiFiMatch in real-world environment, we conducted experiments in the fifth floor of a teaching hall on campus. Approximately, we covered a $78.95m \times 56.40m$ floor plan, as shown in Fig. \ref{fig-envionment}. A prototype is implemented on an Android version 6.0.1 Xiaomi III smartphone. The prototype samples the accelerometer, gyroscope and magnetometer sensors at $50$Hz and Wi-Fi at $1$Hz. Three participants (two males and one female) were asked to complete the experiments. The participants were asked to walking along Trajectory $No.1$ ($T_1$), Trajectory $No.2$ ($T_2$) and Trajectory $No.3$ ($T_3$) in a constant speed. Each trajectory was repeated six times by all participants. In order to record the walking trajectories, all the participants' shoes were painted with colored powder. This offered the ground truth.
+In this section, we show our evaluation for the performance of AiFiMatch in real-world environment, we conducted experiments in the fifth floor of a teaching hall on campus. Approximately, we covered a $78.95m \times 56.40m$ floor plan, as shown in Fig. \ref{fig-envionment}. A prototype is implemented and installed on an Android version 6.0.1 Xiaomi III smartphone, an Android version 6.0.1 360 N5 smartphone and an Android version 4.4.0 Coolpad 8675-FHD smartphone. The prototype samples the accelerometer, gyroscope and magnetometer sensors at $50$Hz and Wi-Fi at $1$Hz. Three participants (two males and one female) were asked to complete the experiments. The participants were asked to walking along Trajectory $No.1$ ($T_1$), Trajectory $No.2$ ($T_2$) and Trajectory $No.3$ ($T_3$) in a constant speed. Each trajectory was repeated six times by all participants. In order to record the walking trajectories, all the participants' shoes were painted with colored powder. This offered the ground truth.
 
 \subsection{Performance of Map Matching}
 
