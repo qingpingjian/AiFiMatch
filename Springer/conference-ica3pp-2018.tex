@@ -171,12 +171,10 @@ In this paper, AiFiMatch considers four types of pedestrian activities: stationa
 In the indoor environment, there are many activity-relative locations such as corridor corners and entrances of rooms where pedestrians may perform different activities other than normal walking. These special locations divide the indoor roads into segments. With road segments as nodes in the form of \emph{(coordinate of first endpoint $(x_1,y_1)$, accessible direction of first endpoint $({\theta}_1)$, coordinate of second endpoint $(x_2,y_2)$, accessible direction of second endpoint $({\theta}_2)$)}, the activity type from one road segment to another as directional edges in the form of \emph{(activity type (AT))}, the indoor floor plan would be represented as a direction graph. Fig. \ref{fig-abstract} shows an example of indoor floor abstraction. 
 
 \begin{figure}[!htbp]
-	\vspace{-10pt}
 	\centering
 	\includegraphics[width=4.576in]{AiFiMatch-MapAbstract}
 	\caption{Floor Plan Abstraction Example.}
 	\label{fig-abstract}
-	\vspace{-10pt}
 \end{figure}
 
 \section{HMM based Map Matching Algorithm}
@@ -239,12 +237,10 @@ where $Ped_{dir}$ denotes the heading direction of a pedestrian, $s$ is a state,
 \subsection{Optimal State Sequence Estimation}
 
 \begin{figure}[!htbp]
-	\vspace{-10pt}
 	\centering
 	\includegraphics[width=4.6in]{AiFiMatch-Viterbi}
 	\caption{Illustration of the Viterbi Decoding.}
 	\label{fig-viterbi}
-	\vspace{-15pt}
 \end{figure}
 
 For AiFiMatch to operate in real-time, it cannot wait until the whole sequence is available. Hence, in an incremental manner, AiFiMatch users a sliding window on the Map Matching module. Every time a new step of a pedestrian is detected, the HMM parameters are calculated for the new introduced sensors data and the associated candidate states. The online Viterbi algorithm \cite{bloit2008short} is then applied to compute the maximum likelihood sequence of states for the current window using dynamic programming. Fig. \ref{fig-viterbi} illustrates the proposed HMM model Viterbi decoding. The sliding window size is $3$ and the decoded sequence is colored in blue. The initial states probability is also updated as the sliding window moves.
@@ -388,7 +384,6 @@ We compare the performance of AiFiMatch algorithm in terms of convergence to map
 The offline positioning results are derived retrospectively after matching the walking trajectory of a pedestrian to a unique road segments sequence by AiFiMatch. Fig. \ref{fig-envandoffline} shows the tracking trajectories and some details are summarized in Table 2. AiFiMatch system tracked pedestrians' trajectories accurately in the experiment environments and the mean error of the offline positioning is about $1.24$ m.
 
 \begin{figure*}[!ht]
-	\vspace{-10pt}
 	\centering
 	\subfloat[$Experiment\ Environment$]{\includegraphics[width=2.325in]{AiFiMatch-Environment}%
 		\label{fig-envionment}}
@@ -403,11 +398,9 @@ The offline positioning results are derived retrospectively after matching the w
 		\label{fig-offlineT3}}
 	\caption{ Environment Setup and Offline Positioning Results for Each Trajectory}
 	\label{fig-envandoffline}
-	\vspace{-15pt}
 \end{figure*}
 
 \begin{table}
-	\vspace{-15pt}
 	\newcommand{\tabincell}[2]{\begin{tabular}{@{}#1@{}}#2\end{tabular}}
 	\label{tab-offline}
 	\caption{Evaluation Results}
@@ -424,7 +417,6 @@ The offline positioning results are derived retrospectively after matching the w
 			\hline
 		\end{tabular}
 	\end{center}
-	\vspace{-25pt}
 \end{table} 
 
 \section{Conclusion}
