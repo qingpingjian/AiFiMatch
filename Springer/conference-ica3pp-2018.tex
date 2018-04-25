@@ -34,7 +34,7 @@
 \usepackage{algorithmic}
 
 %% ------ packages for list  ------ %%
-\usepackage{enumitem}% http://ctan.org/pkg/enumitem
+%\usepackage{enumitem}% http://ctan.org/pkg/enumitem
 
 
 %% ------ typesetting with little spacing ------ %%
@@ -103,12 +103,12 @@ Crowdsourcing is a low-cost and efficient way to extract useful information from
 %\end{itemize}
 %\vspace{-16.45pt}
 
-In summary, this paper's mainly contributions are as follows:
-\begin{itemize}[noitemsep,topsep=0pt]
-	\renewcommand{\labelitemi}{$\vcenter{\hbox{\tiny$\bullet$}}$}
-	\item we present the architecture of AiFiMatch: a map matching algorithm based on activity detection and crowd-sourced Wi-Fi.
-	\item we present the architecture of AiFiMatch: a map matching algorithm based on activity detection and crowd-sourced Wi-Fi.
-\end{itemize}
+%In summary, this paper's mainly contributions are as follows:
+%\begin{itemize}[noitemsep,topsep=0pt]
+%	\renewcommand{\labelitemi}{$\vcenter{\hbox{\tiny$\bullet$}}$}
+%	\item we present the architecture of AiFiMatch: a map matching algorithm based on activity detection and crowd-sourced Wi-Fi.
+%	\item we present the architecture of AiFiMatch: a map matching algorithm based on activity detection and crowd-sourced Wi-Fi.
+%\end{itemize}
 
 The remainder of this paper is organized as follows: Section II reviews the related work. Section III gives an overview of the AiFiMatch system and its preprocessing components. Then, we detail the proposed HMM-based map matching algorithm in Section IV. Section V shows the experimental results and analysis of the AiFiMatch system. Finally, Section VI concludes this paper.
 
@@ -309,6 +309,19 @@ where $d$ is the threshold to distinguish two Wi-Fi fingerprint sequences. A pil
 
 \subsection{Optimal State Sequence Estimation}
 
+Once the HMM parameters are estimated, we can user the Viterbi algorithm to get the most probable hidden states sequence $Q = ({q_1},{q_2},...,{q_k})$ for a given observation sequence $O = ({o_1},{o_2},...,{o_k})$. A Viterbi variable ${\delta _t}(i)$ is defined by formula \ref{equ-vtbvar} to represent that, at time $t$, the HMM model reaches the hidden state $s_i$ along a certain path and outputs the maximum probability.
+\begin{equation}
+	\label{equ-vtbvar}
+	{\delta _t}(i) = max\{ p({q_1},{q_2},...,{q_t} = {s_i},{o_1},{o_2},...,{o_t}|\lambda )\}
+\end{equation}
+
+At time $t+1$, the maximum probability reaching the hidden state $s_j$ can be recursively derived from the Viterbi variable at time $t$ by the following formula. 
+\begin{equation}
+	{\delta _{t + 1}}(j) = [\mathop {max}\limits_i \{ {\delta _t}(i) \cdot p({q_{t + 1}} = {s_j}|{q_t} = {s_i})\} ] \cdot p({o_{t + 1}}|{q_{t + 1}}),1 \le t \le k
+\end{equation}
+
+For AiFiMatch to operate in real-time, it cannot wait until the whole sequence is available. Hence, The online Viterbi algorithm \cite{bloit2008short} is applied to compute the maximum likelihood sequence of states using dynamic programming. AiFiMatch users Viterbi algorithm in an incremental manner. Every time a new step of a pedestrian is detected, the HMM parameters are calculated for the new introduced sensors data and the associated candidate states.  Fig. \ref{fig-viterbi} illustrates the proposed HMM model Viterbi decoding. The decoded sequence is colored in blue.
+
 \begin{figure}[!htbp]
 	\centering
 	\includegraphics[width=4.6in]{AiFiMatch-Viterbi}
@@ -316,13 +329,11 @@ where $d$ is the threshold to distinguish two Wi-Fi fingerprint sequences. A pil
 	\label{fig-viterbi}
 \end{figure}
 
-For AiFiMatch to operate in real-time, it cannot wait until the whole sequence is available. Hence, in an incremental manner, AiFiMatch users a sliding window on the Map Matching module. Every time a new step of a pedestrian is detected, the HMM parameters are calculated for the new introduced sensors data and the associated candidate states. The online Viterbi algorithm \cite{bloit2008short} is then applied to compute the maximum likelihood sequence of states for the current window using dynamic programming. Fig. \ref{fig-viterbi} illustrates the proposed HMM model Viterbi decoding. The sliding window size is $3$ and the decoded sequence is colored in blue. The initial states probability is also updated as the sliding window moves.
-
-Once the HMM parameters are estimated, we can user the Viterbi algorithm to get the most probable hidden states sequence for a given observation sequence. During the beginning process of the algorithm, if the number of states is too small, the most probable states sequence is not always the correct one, especially when the starting point of pedestrian is unknown. Therefore, we give a criteria by formula $c = {{{p_{fir}}} \mathord{\left/
+During the beginning process of the algorithm, if the number of states is too small, the most probable states sequence is not always the correct one, especially when the starting point of pedestrian is unknown. Therefore, we give a criteria by formula $c = {{{p_{fir}}} \mathord{\left/
 		{\vphantom {{{p_{fir}}} {{p_{\sec }}}}} \right.
-\kern-\nulldelimiterspace} {{p_{\sec }}}}$ to determine the status of this algorithm, where ${p_{fir}}$ is the highest probability of the states sequence and ${p_{\sec }}$ is the second highest probability of the states sequence. We set a threshold, if $c$ is greater than or equal to the threshold, we choose the Viterbi decoding result. The selected hidden states sequence represents the pedestrian's passed indoor road segments.
+		\kern-\nulldelimiterspace} {{p_{\sec }}}}$ to determine the status of this algorithm, where ${p_{fir}}$ is the highest probability of the states sequence and ${p_{\sec }}$ is the second highest probability of the states sequence. We set a threshold, if $c$ is greater than or equal to the threshold, we choose the Viterbi decoding result. The selected hidden states sequence represents the pedestrian's passed indoor road segments.
 
-\subsection{Algorithm}
+AiFiMatch algorithm is summarized with the pseudocode in Algorithm \ref{alg_aifi}.  
 
 \begin{algorithm}[H]
 	\caption{AiFiMatch online map matching algorithm}
@@ -330,14 +341,13 @@ Once the HMM parameters are estimated, we can user the Viterbi algorithm to get 
 	\begin{algorithmic}[1]
 		\renewcommand{\algorithmicrequire}{\textbf{Input:}}
 		\renewcommand{\algorithmicensure}{\textbf{Output:}}
-		\REQUIRE Sensor data up to current time t: $data_{0:t}$
+		\REQUIRE Sensor data up to current time t: $data_{1:t}$
 		\REQUIRE Abstract Indoor Floor Plan: $fp$
-		\REQUIRE Length of state sequence up to last time $t-1$: $k$
-		\REQUIRE State Sequence up to last time $t-1$: $S_{k}(t-1)$
+		\REQUIRE Hidden State Sequence and Its Length up to last time $t-1$: $S_{k}(t-1)$, $k$
 		\REQUIRE Array of Viterbi variable and backward pointer: ${VtbArr}_{k}(t-1)$
 		\ENSURE Pedestrian's position estimation at current time $t$: $Ped_{loc}(t)$
 		\ENSURE Optimal state sequence estimation at current time $t$: $Q(t)$
-		\STATE ${Ped_{AT}(t)}, at \leftarrow activity\_detect({data_{0:t}})$
+		\STATE ${Ped_{AT}(t)}, at \leftarrow activity\_detect({data_{1:t}})$
 		\IF{$Ped_{AT}(t)\ != \ None$}  
 		\STATE ${st} \leftarrow {at}$  
 		
@@ -391,7 +401,7 @@ In this section, we show our evaluation for the performance of AiFiMatch in real
 
 \subsection{Performance of Map Matching}
 
-To evaluate AiFiMatch map matching performance, we start by showing the online positioning performance of AiFiMatch and basic PDR technique. Then, we discussed the convergence performance as compared to an activity sequence-based map matching algorithm proposed by \emph{Zhou et al} \cite{zhou2015activity}. Finally, we show the offline positioning results when using AiFiMatch.
+To evaluate AiFiMatch map matching performance, we start by showing the online positioning performance of AiFiMatch and basic PDR technique. After that, we analyze the effect of inertial sensor error on positioning accuracy. Then, we discuss the convergence performance as compared to an activity sequence-based map matching algorithm proposed by \emph{Zhou et al} \cite{zhou2015activity}. Finally, we show the offline positioning results when using AiFiMatch.
 
 \subsubsection{Online Positioning Performance:}
 
@@ -403,6 +413,9 @@ Euclidean distance between the estimated position and the ground truth is introd
 	\caption{Online positioning results for Each Trajectory.}
 	\label{fig-online}
 \end{figure}
+
+%% ------ TODO: inertial sensor error ------ %%
+
 
 \subsubsection{Convergence Speed:}
 
