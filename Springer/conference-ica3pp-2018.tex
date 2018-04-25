@@ -6,27 +6,6 @@
 %\documentclass{llncs}
 \documentclass[runningheads]{llncs}
 
-%%% Save the class definition of \subparagraph
-%\let\llncssubparagraph\subparagraph
-%%% Provide a definition to \subparagraph to keep titlesec happy
-%\let\subparagraph\paragraph
-%%% Load titlesec
-%\usepackage[compact]{titlesec}
-%%% Revert \subparagraph to the llncs definition
-%\let\subparagraph\llncssubparagraph
-
-%% ------ packages for authors format  ------ %%
-\usepackage[misc]{ifsym}
-\usepackage{bbding}
-%% ------ packages for authors format  ------ %%
-
-\usepackage{algorithm} % add by pete
-\usepackage{algorithmic}
-
-\usepackage{url}
-\urldef{\mailsa}\path|{yuwenping}@mail.nankai.edu.cn|
-\urldef{\mailsb}\path|{zhangjz, xujd, xuyw}@nankai.edu.cn|
-
 % *** GRAPHICS RELATED PACKAGES ***
 \usepackage{graphicx}
 % declare the path(s) where your graphic files are
@@ -35,9 +14,38 @@
 % every instance of \includegraphics
 \DeclareGraphicsExtensions{.pdf,.jpeg,.png}
 
+%% ------ Packages added by pete ------ %%
+%% ------ packages for authors format  ------ %%
+\usepackage[misc]{ifsym}
+\usepackage{bbding}
+\usepackage{url}
+
+\urldef{\mailsa}\path|{yuwenping}@mail.nankai.edu.cn|
+\urldef{\mailsb}\path|{zhangjz, xujd, xuyw}@nankai.edu.cn|
+%% ------ packages for authors format  ------ %%
+
+%% ------ packages for subfigures  ------ %%
 \usepackage[caption=false,font=footnotesize]{subfig}
 %\usepackage{caption}
 %\usepackage[justification=centering]{caption}
+
+%% ------ packages for algorithm expressed with the pseudocode  ------ %%
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+%% ------ packages for list  ------ %%
+\usepackage{enumitem}% http://ctan.org/pkg/enumitem
+
+
+%% ------ typesetting with little spacing ------ %%
+%%% Save the class definition of \subparagraph
+%\let\llncssubparagraph\subparagraph
+%%% Provide a definition to \subparagraph to keep titlesec happy
+%\let\subparagraph\paragraph
+%%% Load titlesec
+%\usepackage[compact]{titlesec}
+%%% Revert \subparagraph to the llncs definition
+%\let\subparagraph\llncssubparagraph
 
 \begin{document}
 
@@ -84,21 +92,23 @@ The positioning error of PDR technique mainly comes from step length and directi
 
 Crowdsourcing is a low-cost and efficient way to extract useful information from data acquired by crowd participants \cite{wang2016indoor}. The crowdsourcing method has been successfully applied to construct Wi-Fi fingerprint database \cite{zhang2014robust,xiang2017tack}. At present, Wi-Fi access points (AP) have been widely developed in public buildings. It is feasible to introduce Wi-Fi signal feature into map matching algorithms \cite{newson2009hidden,seitz2010hidden}. Therefore this paper proposed AiFiMatch: a novel hidden markov model (HMM) based map matching algorithm, which integrates activity-based map matching and crowdsourced Wi-Fi. The fundamental idea of this algorithm is that smartphones can simultaneously collect motion sensors data and Wi-Fi received signal strength (RSS) values as pedestrians walking. Wi-Fi RSS can be a new feature to eliminate the symmetry of indoor environments and reduce the number of candidate hidden states in our HMM model. Thus, AiFiMatch can get the pedestrian's position estimations within a short time delay. 
 
+%In summary, this paper's mainly contributions are as follows:
+%\vspace{-16.45pt}
+%\begin{itemize}
+%	\setlength{\parskip}{0pt} 
+%	\setlength{\itemsep}{0pt plus 1pt}
+%	\renewcommand{\labelitemi}{$\vcenter{\hbox{\tiny$\bullet$}}$}
+%	\item we present the architecture of AiFiMatch: a map matching algorithm based on activity detection and crowd-sourced Wi-Fi.
+%	\item we present the architecture of AiFiMatch: a map matching algorithm based on activity detection and crowd-sourced Wi-Fi.
+%\end{itemize}
+%\vspace{-16.45pt}
+
 In summary, this paper's mainly contributions are as follows:
-
-%$\vcenter{\hbox{\tiny$\bullet$}}$ we present the architecture of AiFiMatch: a map matching algorithm based on activity detection and crowd-sourced Wi-Fi.
-%
-%$\vcenter{\hbox{\tiny$\bullet$}}$ we present the architecture of AiFiMatch: a map matching algorithm based on activity detection and crowd-sourced Wi-Fi.
-
-\vspace{-16.45pt}
-\begin{itemize}
-	\setlength{\parskip}{0pt} 
-	\setlength{\itemsep}{0pt plus 1pt}
+\begin{itemize}[noitemsep,topsep=0pt]
 	\renewcommand{\labelitemi}{$\vcenter{\hbox{\tiny$\bullet$}}$}
 	\item we present the architecture of AiFiMatch: a map matching algorithm based on activity detection and crowd-sourced Wi-Fi.
 	\item we present the architecture of AiFiMatch: a map matching algorithm based on activity detection and crowd-sourced Wi-Fi.
 \end{itemize}
-\vspace{-16.45pt}
 
 The remainder of this paper is organized as follows: Section II reviews the related work. Section III gives an overview of the AiFiMatch system and its preprocessing components. Then, we detail the proposed HMM-based map matching algorithm in Section IV. Section V shows the experimental results and analysis of the AiFiMatch system. Finally, Section VI concludes this paper.
 
@@ -468,7 +478,7 @@ This paper proposed AiFiMatch: a novel map matching Algorithm based on activity 
 %
 % ---- Bibliography ----
 %
-\bibliographystyle{splncs}
+%\bibliographystyle{splncs}
 %\bibliographystyle{splncs03_unsrt}
 %% ------ update by springer lncs ----- %%
 \bibliographystyle{splncs04}
