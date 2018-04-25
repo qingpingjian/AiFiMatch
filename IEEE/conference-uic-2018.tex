@@ -133,14 +133,14 @@ In the balance of this section, we give the details of three preprocessing compo
 
 PDR is a positioning scheme that derives the current position by adding the estimated displacement to the previous one based on motion sensors carried by smartphones. In PDR scheme, the pedestrian's position is usually updated by the step and the heading direction during one step is supposed to be unchanged. The pedestrian's position after $k-1$ steps can be denoted as $(x_{k-1},y_{k-1})$. The $k$-th step length and heading direction are denoted as $sl_k$ and $\theta_k$, respectively. Then, the pedestrian's position after $k$ steps can be obtained by the following formula:
 \begin{equation}
-	\label{equ_pdr}
-	\left( {\begin{array}{*{20}{c}}
-		{{x_k}}\\
-		{{y_k}}
-		\end{array}} \right){\rm{ = }}\left( {\begin{array}{*{20}{c}}
-		{{x_{k - 1}} + s{l_k} \cdot \sin {\theta _k}}\\
-		{{y_{k - 1}} + s{l_k} \cdot \cos {\theta _k}}
-		\end{array}} \right)
+\label{equ_pdr}
+\left( {\begin{array}{*{20}{c}}
+	{{x_k}}\\
+	{{y_k}}
+	\end{array}} \right){\rm{ = }}\left( {\begin{array}{*{20}{c}}
+	{{x_{k - 1}} + s{l_k} \cdot \sin {\theta _k}}\\
+	{{y_{k - 1}} + s{l_k} \cdot \cos {\theta _k}}
+	\end{array}} \right)
 \end{equation}
 
 The heading direction is measured by the fusion of gyroscope and magnetometer. The step length and step count estimate approach is out of scope of this paper and can be found in \cite{wang2012no}.

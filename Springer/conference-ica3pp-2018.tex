@@ -3,19 +3,22 @@
 % for Lecture Notes in Computer Science,
 % version 2.4 for LaTeX2e as of 16. April 2010
 %
-\documentclass{llncs}
+%\documentclass{llncs}
+\documentclass[runningheads]{llncs}
 
-%% Save the class definition of \subparagraph
-\let\llncssubparagraph\subparagraph
-%% Provide a definition to \subparagraph to keep titlesec happy
-\let\subparagraph\paragraph
-%% Load titlesec
-\usepackage[compact]{titlesec}
-%% Revert \subparagraph to the llncs definition
-\let\subparagraph\llncssubparagraph
+%%% Save the class definition of \subparagraph
+%\let\llncssubparagraph\subparagraph
+%%% Provide a definition to \subparagraph to keep titlesec happy
+%\let\subparagraph\paragraph
+%%% Load titlesec
+%\usepackage[compact]{titlesec}
+%%% Revert \subparagraph to the llncs definition
+%\let\subparagraph\llncssubparagraph
 
+%% ------ packages for authors format  ------ %%
 \usepackage[misc]{ifsym}
 \usepackage{bbding}
+%% ------ packages for authors format  ------ %%
 
 \usepackage{algorithm} % add by pete
 \usepackage{algorithmic}
@@ -67,8 +70,8 @@ $^2$\mailsb\\}
 
 Map matching has been widely investigated in indoor pedestrian navigation to improve positioning accuracy and robustness. In this paper, we present AiFiMatch: a map matching algorithm that can provide accurate pedestrian walking trajectory  tracking based on Hidden Markov model (HMM) for smartphone users. AiFiMatch abstracts the indoor map using a directed graph model in which the location-related activities, such as turn, walking stairs, taking the elevator, are directed edges, indoor road segments between these special locations are nodes. With the help of a novel HMM model, AiFiMatch maps pedestrian's walking trajectory subset sequence to indoor map based on activity detection (AD). Simultaneously, Wi-Fi fingerprints can be bound to physical locations by timestamp. AiFiMatch can automatically construct and update radio map of indoor road segments via crowdsourcing. With this radio map, AiFiMatch  efficiently solves the multiple hypotheses problem. We have evaluated our proposed algorithm using smartphones in the fifth floor of a teaching building on campus. Experimental results show that AiFiMatch can accurately track a pedestrian even without knowing the initial point in the experimental environment.  The mean offline positioning error is about $1.24$ m. The results also demonstrate that AiFiMatch significantly improves the convergence speed in buildings with Wi-Fi infrastructure.
 
-\keywords{Map Matching, Hidden Markov Model, Activity Detection, Crowdsourced Wi-Fi}
-
+%\keywords{Map Matching, Hidden Markov Model, Activity Detection, Crowdsourced Wi-Fi}
+\keywords{Map Matching  \and Hidden Markov Model \and Activity Detection \and Crowdsourced Wi-Fi.}
 \end{abstract}
 %
 \section{Introduction}
@@ -79,9 +82,23 @@ It is common for indoor positioning schemes to leverage on pre-installed infrast
 
 The positioning error of PDR technique mainly comes from step length and direction estimation errors and even small errors will be magnified by cumulation over time. Indoor map information may be connected with PDR, namely map matching algorithm \cite{aly2015semmatch}. Several map matching algorithms have been proposed to constrain the cumulative errors \cite{zhou2015activity,aly2015semmatch,zhou2015alimc,abdelnasser2016semanticslam,qiu2017iframe}.  One algorithm uses activity-related locations as virtual landmarks to find the optimal trajectory of a pedestrian. The activity-related locations are special locations of a building, such as an elevator, a stair, a corner, and so on. When a pedestrian passes these locations, the pedestrian's activities can be distinguished from normal walking. Human activity detection (AD) algorithms based on smartphones have attracted more and more researchers' attention in the past decade. Given the symmetry of indoor environment, activity-based map matching algorithms fails since there may be more than one alternatives for the same activity feature or activity sequence \cite{zhou2015activity}.
 
-Crowdsourcing is a low-cost and efficient way to extract useful information from data acquired by crowd participants \cite{wang2016indoor}. The crowdsourcing method has been successfully applied to construct Wi-Fi fingerprint database \cite{zhang2014robust,xiang2017tack}. At present, Wi-Fi access points (AP) have been widely developed in public buildings. It is feasible to introduce Wi-Fi signal feature into map matching algorithms \cite{newson2009hidden,seitz2010hidden}. Therefore this paper proposed AiFiMatch: a novel hidden markov model (HMM) based map matching algorithm, which integrates activity-based map matching and crowdsourced Wi-Fi. The fundamental idea of this algorithm is that smartphones can simultaneously collect motion sensors data and Wi-Fi received signal strength (RSS) values as pedestrians walking. Wi-Fi RSS can be a new feature to eliminate the symmetry of indoor environments and reduce the number of candidate hidden states in our HMM model. Thus, AiFiMatch can get the pedestrian's position estimations within a short time delay.
+Crowdsourcing is a low-cost and efficient way to extract useful information from data acquired by crowd participants \cite{wang2016indoor}. The crowdsourcing method has been successfully applied to construct Wi-Fi fingerprint database \cite{zhang2014robust,xiang2017tack}. At present, Wi-Fi access points (AP) have been widely developed in public buildings. It is feasible to introduce Wi-Fi signal feature into map matching algorithms \cite{newson2009hidden,seitz2010hidden}. Therefore this paper proposed AiFiMatch: a novel hidden markov model (HMM) based map matching algorithm, which integrates activity-based map matching and crowdsourced Wi-Fi. The fundamental idea of this algorithm is that smartphones can simultaneously collect motion sensors data and Wi-Fi received signal strength (RSS) values as pedestrians walking. Wi-Fi RSS can be a new feature to eliminate the symmetry of indoor environments and reduce the number of candidate hidden states in our HMM model. Thus, AiFiMatch can get the pedestrian's position estimations within a short time delay. 
 
-%In summary, this paper's mainly contributions are as follows:
+In summary, this paper's mainly contributions are as follows:
+
+%$\vcenter{\hbox{\tiny$\bullet$}}$ we present the architecture of AiFiMatch: a map matching algorithm based on activity detection and crowd-sourced Wi-Fi.
+%
+%$\vcenter{\hbox{\tiny$\bullet$}}$ we present the architecture of AiFiMatch: a map matching algorithm based on activity detection and crowd-sourced Wi-Fi.
+
+\vspace{-16.45pt}
+\begin{itemize}
+	\setlength{\parskip}{0pt} 
+	\setlength{\itemsep}{0pt plus 1pt}
+	\renewcommand{\labelitemi}{$\vcenter{\hbox{\tiny$\bullet$}}$}
+	\item we present the architecture of AiFiMatch: a map matching algorithm based on activity detection and crowd-sourced Wi-Fi.
+	\item we present the architecture of AiFiMatch: a map matching algorithm based on activity detection and crowd-sourced Wi-Fi.
+\end{itemize}
+\vspace{-16.45pt}
 
 The remainder of this paper is organized as follows: Section II reviews the related work. Section III gives an overview of the AiFiMatch system and its preprocessing components. Then, we detail the proposed HMM-based map matching algorithm in Section IV. Section V shows the experimental results and analysis of the AiFiMatch system. Finally, Section VI concludes this paper.
 
@@ -129,8 +146,19 @@ In the balance of this section, we give the details of three preprocessing compo
 PDR is a positioning scheme that derives the current position by adding the estimated displacement to the previous one based on motion sensors carried by smartphones. In PDR scheme, the pedestrian's position is usually updated by the step and the heading direction during one step is supposed to be unchanged. The pedestrian's position after $k-1$ steps can be denoted as $(x_{k-1},y_{k-1})$. The $k$-th step length and heading direction are denoted as $sl_k$ and $\theta_k$, respectively. Then, the pedestrian's position after $k$ steps can be obtained by the following formula:
 \begin{equation}
 \label{equ_pdr}
-({x_k},{y_k}) = ({x_{k - 1}} + s{l_k} \cdot sin{\theta _k},{y_{k - 1}} + s{l_k} \cdot \cos {\theta _k})
+\left( {\begin{array}{*{20}{c}}
+	{{x_k}}\\
+	{{y_k}}
+	\end{array}} \right){\rm{ = }}\left( {\begin{array}{*{20}{c}}
+	{{x_{k - 1}} + s{l_k} \cdot \sin {\theta _k}}\\
+	{{y_{k - 1}} + s{l_k} \cdot \cos {\theta _k}}
+	\end{array}} \right)
 \end{equation}
+
+%\begin{equation}
+%\label{equ_pdr}
+%({x_k},{y_k}) = ({x_{k - 1}} + s{l_k} \cdot sin{\theta _k},{y_{k - 1}} + s{l_k} \cdot \cos {\theta _k})
+%\end{equation}
 
 The heading direction is measured by the fusion of gyroscope and magnetometer. The step length and step count estimate approach is out of scope of this paper and can be found in \cite{wang2012no}. 
 
@@ -234,21 +262,6 @@ Intuitively, the heading direction of a pedestrian should match the direction of
 
 where $Ped_{dir}$ denotes the heading direction of a pedestrian, $s$ is a state, $H_{TH}$ is the threshold for candidate extraction, which is set to $55^\circ$ based on the experiments.
 
-\subsection{Optimal State Sequence Estimation}
-
-\begin{figure}[!htbp]
-	\centering
-	\includegraphics[width=4.6in]{AiFiMatch-Viterbi}
-	\caption{Illustration of the Viterbi Decoding.}
-	\label{fig-viterbi}
-\end{figure}
-
-For AiFiMatch to operate in real-time, it cannot wait until the whole sequence is available. Hence, in an incremental manner, AiFiMatch users a sliding window on the Map Matching module. Every time a new step of a pedestrian is detected, the HMM parameters are calculated for the new introduced sensors data and the associated candidate states. The online Viterbi algorithm \cite{bloit2008short} is then applied to compute the maximum likelihood sequence of states for the current window using dynamic programming. Fig. \ref{fig-viterbi} illustrates the proposed HMM model Viterbi decoding. The sliding window size is $3$ and the decoded sequence is colored in blue. The initial states probability is also updated as the sliding window moves.
-
-Once the HMM parameters are estimated, we can user the Viterbi algorithm to get the most probable hidden states sequence for a given observation sequence. During the beginning process of the algorithm, if the number of states is too small, the most probable states sequence is not always the correct one, especially when the starting point of pedestrian is unknown. Therefore, we give a criteria by formula $c = {{{p_{fir}}} \mathord{\left/
-		{\vphantom {{{p_{fir}}} {{p_{\sec }}}}} \right.
-\kern-\nulldelimiterspace} {{p_{\sec }}}}$ to determine the status of this algorithm, where ${p_{fir}}$ is the highest probability of the states sequence and ${p_{\sec }}$ is the second highest probability of the states sequence. We set a threshold, if $c$ is greater than or equal to the threshold, we choose the Viterbi decoding result. The selected hidden states sequence represents the pedestrian's passed indoor road segments.
-
 \subsection{Wi-Fi Enhancement}
 Map matching offers an important source of information and an excellent way to improve the position estimations, especially in narrow corridors, but it has some limitations when the indoor environment presents symmetries that generates multiple hypotheses. Supposing that a pedestrian walks along this segments sequence $(s_3, s_4, s_5, s_6)$, as shown in Fig. \ref{fig-viterbi}, for the given observable states, it is directly to be seen that the segments sequence $(s_6, s_7, s_8, s_9)$ may have almost the same matching probability as the actual one. In this situation, traditional HMM based map matching algorithm fails \cite{zhou2015activity}.
 
@@ -268,7 +281,7 @@ L({S_a},{\rm{ }}{S_b}) = \min (\frac{1}{w}\sum\limits_{t = 1}^w {{J_\delta }({f_
 
 where $w=|S_a|$, $k=|S_b|$ and $2<w<k$. Given segment candidate set $G$ and the set $R$ of all road segments bound with Wi-Fi fingerprints sequence, Finally, AiFiMatch models the dissimilarity of two Wi-Fi fingerprint sequences and the different stages of fingerprint database by the following function to select the candidates: 
 \begin{equation}
-{g_2}({S_{ped,}}{S_i}) = \left\{ {\begin{array}{*{20}{l}}
+{g_2} = {g_2}({S_{ped,}}{S_i}) = \left\{ {\begin{array}{*{20}{l}}
 	{0,if{\kern 1pt} i{\kern 1pt}  \ne \mathop {\arg \min }\limits_j \{ L({S_{ped,}}{S_j}),{S_j} \in G,G \subseteq R\} }\\
 	{0,if{\kern 1pt} \min \{ L({S_{ped}},{S_i}),{\kern 1pt} {\kern 1pt} {S_i} \in G{\kern 1pt} {\kern 1pt}  \cap R\}  > d{\kern 1pt} {\kern 1pt} }\\
 	{1,otherwise}
@@ -276,6 +289,28 @@ where $w=|S_a|$, $k=|S_b|$ and $2<w<k$. Given segment candidate set $G$ and the 
 \end{equation}
 
 where $d$ is the threshold to distinguish two Wi-Fi fingerprint sequences. A pilot study is conducted to evaluate the dissimilarities between two fingerprint sequences of same and different road segments and the experimental result is shown in Fig. \ref{fig-wifidist}. In the paper, $d$ is set to $0.63$ based on the experiment. 
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=2.58in]{AiFiMatch-WiFiDist}
+	\caption{Dissimilarity of Two Wi-Fi Fingerprint Sequences.}
+	\label{fig-wifidist}
+\end{figure}
+
+\subsection{Optimal State Sequence Estimation}
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=4.6in]{AiFiMatch-Viterbi}
+	\caption{Illustration of the Viterbi Decoding.}
+	\label{fig-viterbi}
+\end{figure}
+
+For AiFiMatch to operate in real-time, it cannot wait until the whole sequence is available. Hence, in an incremental manner, AiFiMatch users a sliding window on the Map Matching module. Every time a new step of a pedestrian is detected, the HMM parameters are calculated for the new introduced sensors data and the associated candidate states. The online Viterbi algorithm \cite{bloit2008short} is then applied to compute the maximum likelihood sequence of states for the current window using dynamic programming. Fig. \ref{fig-viterbi} illustrates the proposed HMM model Viterbi decoding. The sliding window size is $3$ and the decoded sequence is colored in blue. The initial states probability is also updated as the sliding window moves.
+
+Once the HMM parameters are estimated, we can user the Viterbi algorithm to get the most probable hidden states sequence for a given observation sequence. During the beginning process of the algorithm, if the number of states is too small, the most probable states sequence is not always the correct one, especially when the starting point of pedestrian is unknown. Therefore, we give a criteria by formula $c = {{{p_{fir}}} \mathord{\left/
+		{\vphantom {{{p_{fir}}} {{p_{\sec }}}}} \right.
+\kern-\nulldelimiterspace} {{p_{\sec }}}}$ to determine the status of this algorithm, where ${p_{fir}}$ is the highest probability of the states sequence and ${p_{\sec }}$ is the second highest probability of the states sequence. We set a threshold, if $c$ is greater than or equal to the threshold, we choose the Viterbi decoding result. The selected hidden states sequence represents the pedestrian's passed indoor road segments.
 
 \subsection{Algorithm}
 
@@ -363,20 +398,27 @@ Euclidean distance between the estimated position and the ground truth is introd
 
 We compare the performance of AiFiMatch algorithm in terms of convergence to map matching algorithm proposed by \emph{Zhou et al}. Distance traveled before converging to a unique states sequence reflects the convergence speed. The greater the traveled distance, the slower is the convergence speed. Fig. \ref{fig-converg} shows the traveled distance before convergence for \emph{Zhou et al}, AiFiMatch without Wi-Fi enhancement and AiFiMatch with Wi-Fi enhancement. At the initial stage, fingerprint database is empty ($T_1$), AiFiMatch and \emph{Zhou et al.} both successfully converge even without known the initial point. AiFiMatch without Wi-Fi enhancement and map matching algorithm proposed by \emph{Zhou et al.} fail to converge ($\infty$ means $T_2$ cannot be converged.) due to the symmetry of building structure. However, with the help of Wi-Fi signal, $T_2$ reaches convergence quickly. Mostly, with Wi-Fi enhancement, the traveled distance is much shorter than without Wi-Fi enhancement($T_2, T_3$). 
 
+%\begin{figure}[!htbp]
+%	\begin{minipage}[t]{0.5\textwidth}
+%		\centering
+%		\includegraphics[width=2.58in]{AiFiMatch-WiFiDist}
+%		\caption{Dissimilarity of Two Wi-Fi Fingerprint Sequences.}
+%		\label{fig-wifidist}
+%	\end{minipage}
+%	\hfil
+%	\begin{minipage}[t]{0.46\textwidth}
+%		\centering
+%		\includegraphics[width=2.3in]{AiFiMatch-Convergence}
+%		\caption{Distance Traveled before Convergence for Each Trajectory.}
+%		\label{fig-converg}
+%	\end{minipage}
+%\end{figure}
+
 \begin{figure}[!htbp]
-	\begin{minipage}[t]{0.5\textwidth}
-		\centering
-		\includegraphics[width=2.58in]{AiFiMatch-WiFiDist}
-		\caption{Dissimilarity of Two Wi-Fi Fingerprint Sequences.}
-		\label{fig-wifidist}
-	\end{minipage}
-	\hfil
-	\begin{minipage}[t]{0.46\textwidth}
-		\centering
-		\includegraphics[width=2.3in]{AiFiMatch-Convergence}
-		\caption{Distance Traveled before Convergence for Each Trajectory.}
-		\label{fig-converg}
-	\end{minipage}
+	\centering
+	\includegraphics[width=2.3in]{AiFiMatch-Convergence}
+	\caption{Distance Traveled before Convergence for Each Trajectory.}
+	\label{fig-converg}
 \end{figure}
 
 \subsubsection{Offline Positioning Performance:}
@@ -428,6 +470,8 @@ This paper proposed AiFiMatch: a novel map matching Algorithm based on activity 
 %
 \bibliographystyle{splncs}
 %\bibliographystyle{splncs03_unsrt}
+%% ------ update by springer lncs ----- %%
+\bibliographystyle{splncs04}
 \bibliography{AiFiMatch}
 
 \end{document}
