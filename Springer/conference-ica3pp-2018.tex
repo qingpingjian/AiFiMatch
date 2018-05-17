@@ -61,7 +61,7 @@
 %
 %%\author{Wenping Yu\inst{1}}
 
-\author{Wenping Yu$^1$\and Jianzhong Zhang$^2$ $^($\Envelope$^)$\and Jingdong Xu$^2$ \and Yuwei Xu$^2$}
+\author{Jianzhong Zhang$^2$ $^($\Envelope$^)$ \and Wenping Yu$^1$ \and Jingdong Xu$^2$ \and Yuwei Xu$^2$}
 %
 \authorrunning{Wenping Yu et al.} % abbreviated author list (for running head)
 %
@@ -77,7 +77,7 @@ $^2$\mailsb\\}
 
 \begin{abstract}
 
-Map matching has been widely investigated in indoor pedestrian navigation to improve positioning accuracy and robustness. In this paper, we present AiFiMatch: a map matching algorithm that can provide accurate pedestrian walking trajectory  tracking based on Hidden Markov model (HMM) for smartphone users. AiFiMatch abstracts the indoor map using a directed graph model in which the location-related activities, such as turn, walking stairs, taking the elevator, are directed edges, indoor road segments between these special locations are nodes. With the help of a novel HMM model, AiFiMatch maps pedestrian's walking trajectory subset sequence to indoor map based on activity detection (AD). Simultaneously, Wi-Fi fingerprints can be bound to physical locations by timestamp. AiFiMatch can automatically construct and update radio map of indoor road segments via crowdsourcing. With this radio map, AiFiMatch  efficiently solves the multiple hypotheses problem. We have evaluated our proposed algorithm using smartphones in the fifth floor of a teaching building on campus. Experimental results show that AiFiMatch can accurately track a pedestrian even without knowing the initial point in the experimental environment.  The mean offline positioning error is about $1.24$ m. The results also demonstrate that AiFiMatch significantly improves the convergence speed in buildings with Wi-Fi infrastructure.
+Map matching has been widely investigated in indoor pedestrian navigation to improve positioning accuracy and robustness. In this paper, we present AiFiMatch: a map matching algorithm that can provide accurate pedestrian walking trajectory tracking based on Hidden Markov model (HMM) for smartphone users. AiFiMatch abstracts the indoor map using a directed graph model in which the location-related activities, such as turn, walking stairs, taking the elevator, are directed edges, indoor road segments between these special locations are nodes. With the help of a novel HMM model, AiFiMatch maps pedestrian's walking trajectory subset sequence to indoor map based on activity detection (AD). Simultaneously, Wi-Fi fingerprints can be bound to physical locations by timestamp. AiFiMatch can automatically construct and update radio map of indoor road segments via crowdsourcing. With this radio map, AiFiMatch  efficiently solves the multiple hypotheses problem. We have evaluated our proposed algorithm using smartphones in the fifth floor of a teaching building on campus. Experimental results show that AiFiMatch can accurately track a pedestrian even without knowing the initial position and is robust to a certain degree of step length and heading direction estimation errors in the experimental environment. The mean offline positioning error is about $1.24$ m. The results also demonstrate that AiFiMatch significantly improves the convergence speed in buildings with Wi-Fi infrastructure.
 
 %\keywords{Map Matching, Hidden Markov Model, Activity Detection, Crowdsourced Wi-Fi}
 \keywords{Map Matching  \and Hidden Markov Model \and Activity Detection \and Crowdsourced Wi-Fi.}
@@ -91,10 +91,12 @@ It is common for indoor positioning schemes to leverage on pre-installed infrast
 
 The positioning error of PDR technique mainly comes from step length and direction estimation errors and even small errors will be magnified by cumulation over time. Indoor map information may be connected with PDR, namely map matching algorithm \cite{aly2015semmatch}. Several map matching algorithms have been proposed to constrain the cumulative errors \cite{zhou2015activity,aly2015semmatch,zhou2015alimc,abdelnasser2016semanticslam,qiu2017iframe}.  One algorithm uses activity-related locations as virtual landmarks to find the optimal trajectory of a pedestrian. The activity-related locations are special locations of a building, such as an elevator, a stair, a corner, and so on. When a pedestrian passes these locations, the pedestrian's activities can be distinguished from normal walking. Human activity detection (AD) algorithms based on smartphones have attracted more and more researchers' attention in the past decade. Given the symmetry of indoor environment, activity-based map matching algorithms fails since there may be more than one alternatives for the same activity feature or activity sequence \cite{zhou2015activity}.
 
-Crowdsourcing is a low-cost and efficient way to extract useful information from data acquired by crowd participants \cite{wang2016indoor}. The crowdsourcing method has been successfully applied to construct Wi-Fi fingerprint database \cite{zhang2014robust,xiang2017tack}. At present, Wi-Fi access points (AP) have been widely developed in public buildings. It is feasible to introduce Wi-Fi signal feature into map matching algorithms \cite{newson2009hidden,seitz2010hidden}. Therefore this paper proposed AiFiMatch: a novel hidden markov model (HMM) based map matching algorithm, which integrates activity-based map matching and crowdsourced Wi-Fi. The fundamental idea of this algorithm is that smartphones can simultaneously collect motion sensors data and Wi-Fi received signal strength (RSS) values as pedestrians walking. Wi-Fi RSS can be a new feature to eliminate the symmetry of indoor environments and reduce the number of candidate hidden states in our HMM model. Thus, AiFiMatch can get the pedestrian's position estimations within a short time delay. 
+Crowdsourcing is a low-cost and efficient way to extract useful information from data acquired by crowd participants \cite{wang2016indoor}. The crowdsourcing method has been successfully applied to construct Wi-Fi fingerprint database \cite{zhang2014robust,xiang2017tack}. At present, Wi-Fi access points (AP) have been widely developed in public buildings. Meanwhile, almost all smartphones are equipped with Wi-Fi interfaces. Hence, It is feasible to introduce Wi-Fi signal feature, such as received signal strength (RSS), into map matching algorithms \cite{newson2009hidden,seitz2010hidden} to improve the positioning performance. Furthermore, Wi-Fi RSS can be used as a new feature to deal with the multiple hypotheses problem due to the symmetry of indoor environments.
+
+We therefore propose AiFiMatch: a novel hidden markov model (HMM) based map matching algorithm, which integrates activity-based map matching and crowdsourced Wi-Fi. During  pedestrians walking, many smartphones can simultaneously collect motion sensors' data and Wi-Fi received signal strength (RSS) values. On the one hand, AiFiMatch uses motion sensors' data to detect the pedestrian's location-related activities, divides the walking trajectory into sub-trajectory sequence and realizes pedestrian positioning based on PDR even without knowing the initial position by matching the sub-trajectory sequence to indoor road map. On the other hand, according to map matching results, WiFi RSS fingerprints can be bound to physical locations. As time goes by, a Wi-Fi fingerprint database can be built even further by crowdsourcing. This paper defines the dissimilarity between Wi-Fi RSS sequences. With the help of crowdsourced Wi-Fi fingerprint database, this dissimilarity can be used to reduce the number of candidate hidden states in the presented HMM model and even eliminate the symmetry of indoor environment. Thus, AiFiMatch can get the pedestrian's position estimations within a short time delay. 
 
 %In summary, this paper's mainly contributions are as follows:
-%\vspace{-16.45pt}
+%\vspace{-10pt}
 %\begin{itemize}
 %	\setlength{\parskip}{0pt} 
 %	\setlength{\itemsep}{0pt plus 1pt}
@@ -102,7 +104,7 @@ Crowdsourcing is a low-cost and efficient way to extract useful information from
 %	\item we present the architecture of AiFiMatch: a map matching algorithm based on activity detection and crowd-sourced Wi-Fi.
 %	\item we present the architecture of AiFiMatch: a map matching algorithm based on activity detection and crowd-sourced Wi-Fi.
 %\end{itemize}
-%\vspace{-16.45pt}
+%\vspace{-8pt}
 
 %In summary, this paper's mainly contributions are as follows:
 %\begin{itemize}[noitemsep,topsep=0pt]
@@ -137,12 +139,14 @@ AiFiMatch is an activity-based map matching system to pedestrian dead reckoning 
 
 The overall architecture of the AiFiMatch system is shown in Fig. \ref{fig-architecture}. The input to the system is a indoor floor plan and time-stamped sensor data including motion data and Wi-Fi fingerprint. AiFiMatch utilizes embedded sensors of a smartphone to simultaneously collect motion data and Wi-Fi RSS values while the indoor floor plan can be manually entered or generated by crowdsourcing based indoor map construction algorithm.
 
+\vspace{-10pt}
 \begin{figure}[!htbp]
 	\centering
-	\includegraphics[width=4.65in]{AiFiMatch-Architecture}
+	\includegraphics[width=4.7in]{AiFiMatch-Architecture}
 	\caption{AiFiMatch System Architecture.}
 	\label{fig-architecture}
 \end{figure}
+\vspace{-10pt}
 
 Firstly, AiFiMatch starts by indoor floor plan abstraction to create a directed graph to facilitate the map matching model establishment. Secondly, the system estimates the walking distance and heading direction with data of motion sensors. Finally, location-related activities are detected with the pre-trained decision tree, and then the pedestrian's trajectory data including motion data and Wi-Fi RSS values are divided into trajectory subsets sequence.  
 
@@ -175,16 +179,21 @@ The heading direction is measured by the fusion of gyroscope and magnetometer. T
 
 \subsubsection{Activity Detection:}
 
+\vspace{-20pt}
 \begin{figure*}[!ht]
 	\centering
 	\subfloat[$Decision\ Tree\ for\ Activity\ Detection $]{\includegraphics[width=4.75in]{AiFiMatch-ActivityDecision}%
 		\label{fig-activity}}
 	\vfil
-	\subfloat[$Activity\ Detected\ Example$]{\includegraphics[width=4.85in]{AiFiMatch-TurnDemo}%
+	\subfloat[$Turning\ Activity\ Detected\ Example$]{\includegraphics[width=4.85in]{AiFiMatch-TurnDemo}%
 		\label{fig-turndemo}}
 	\caption{Decision Tree for Activity Detection and An Example}
 \end{figure*}
+\vspace{-10pt}
 
+In this paper, AiFiMatch considers four types of pedestrian activities: stationary, normal walking, turning at a corner (left or right turn) and turning around (U-turn), which would occur on the flat ground. The decision tree for activity detection and signal features of each activity is shown in Fig. \ref{fig-activity}. The top level separates walking and stationary based on the variance of the accelerometer. With the help of gyroscope, the second level uses the rotation rate to separate the normal walking and turns while the third level separates the U-turn case from the left or right turn case based on the rotation angle during the turning. Three participants with different brands of smartphones were asked to complete three activities (U-turn, left and right turn) in our experimental environment. The sample size of each activity was $60$ traces. Fig. \ref{fig-turndemo} shows an example for turning activity detection and the activity detection result is summarized in Table $1$.
+
+\vspace{-10pt}
 \begin{table}
 	\label{table_conf}
 	\caption{Confusion Matrix of Activity Detection}
@@ -202,19 +211,20 @@ The heading direction is measured by the fusion of gyroscope and magnetometer. T
 		\end{tabular}
 	\end{center}
 \end{table}
-
-In this paper, AiFiMatch considers four types of pedestrian activities: stationary, normal walking, turning at a corner (left or right turn) and turning around (U-turn), which would occur on the flat ground. The decision tree for activity detection and signal features of each activity is shown in Fig. \ref{fig-activity}. The top level separates walking and stationary based on the variance of the accelerometer. With the help of gyroscope, the second level uses the rotation rate to separate the normal walking and turns while the third level separates the U-turn case from the left or right turn case based on the rotation angle during the turning. Three participants with smartphones were asked to complete three activities (U-turn, left and right turn) in our experimental environment. The sample size of each activity was $60$ traces. Fig. \ref{fig-turndemo} shows an example for activity detection and the activity detection result is summarized in Table $1$.
+\vspace{-30pt}
 
 \subsubsection{Indoor Floor plan Abstraction:}
 
-In the indoor environment, there are many activity-relative locations such as corridor corners and entrances of rooms where pedestrians may perform different activities other than normal walking. These special locations divide the indoor roads into segments. With road segments as nodes in the form of \emph{(coordinate of first endpoint $(x_1,y_1)$, accessible direction of first endpoint $({\theta}_1)$, coordinate of second endpoint $(x_2,y_2)$, accessible direction of second endpoint $({\theta}_2)$)}, the activity type from one road segment to another as directional edges in the form of \emph{(activity type (AT))}, the indoor floor plan would be represented as a direction graph. Fig. \ref{fig-abstract} shows an example of indoor floor abstraction. 
+In the indoor environment, there are many activity-relative locations such as corridor corners and entrances of rooms where pedestrians may perform different activities other than normal walking. These special locations divide the indoor roads into segments. With road segments as nodes in the form of \emph{(coordinate of first endpoint $(x_1,y_1)$, accessible direction of first endpoint $({\varphi}_1)$, coordinate of second endpoint $(x_2,y_2)$, accessible direction of second endpoint $({\varphi}_2)$)}, the activity type from one road segment to another as directional edges in the form of \emph{(activity type (AT))}, the indoor floor plan would be represented as a direction graph. Fig. \ref{fig-abstract} shows an example of indoor floor abstraction. 
 
+\vspace{-10pt}
 \begin{figure}[!htbp]
 	\centering
 	\includegraphics[width=4.576in]{AiFiMatch-MapAbstract}
 	\caption{Floor Plan Abstraction Example.}
 	\label{fig-abstract}
 \end{figure}
+\vspace{-20pt}
 
 \section{HMM based Map Matching Algorithm}
 
@@ -224,7 +234,7 @@ Through this section, we detail the HMM based map matching module of AiFiMatch s
 
 Taking computing power and energy limit of a smartphone into account, our proposed map matching algorithm select HMM to match the pedestrian's trajectory subsets sequence to the directed graph of indoor floor plan. A HMM can be represented as $\lambda  = (S,V,A,B,\pi)$, where:
 
-1) $S = \left\{ {{s_1},{s_2},{s_3}, \ldots ,{s_N}} \right\}$ is the set of possible states and $N = \left| S \right|$. In our case, each state represents an indoor road segment, that is, a node of the directed graph. Note that two or more road segments connected by a straight line can form new states (Fig. \ref{fig-viterbi}). Therefore, a state $s_i$ is represented by the ordered tuple in the form of ($id,x_{1},y_{1},d_{1},x_{2},y_{2},d_{2}$), where $id$ is the identification of road segment, $x_{1}$, $y_{1}$, $d_{1}$, $x_{2}$, $y_{2}$ and $d_{2}$ are different attributes of node, respectively. 
+1) $S = \left\{ {{s_1},{s_2},{s_3}, \ldots ,{s_N}} \right\}$ is the set of possible states and $N = \left| S \right|$. In our case, each state represents an indoor road segment, that is, a node of the directed graph. Therefore, a state $s_i$ is represented by the ordered tuple in the form of ($id,x_{1},y_{1},{\varphi}_{1},x_{2},y_{2},{\varphi}_{2}$), where $id$ is the identification of road segment, $x_{1}$, $y_{1}$, ${\varphi}_{1}$, $x_{2}$, $y_{2}$ and ${\varphi}_{2}$ are different attributes of node of the directed graph, respectively. Note that two or more road segments connected by a straight line can form new states (Fig. \ref{fig-viterbi}).
 
 2) $V = \left\{ {{v_1},{v_2},{v_3}, \ldots ,{v_M}} \right\}$ is the set of observations from the model and $M = \left| V \right|$. For each walking trajectory of a pedestrian, PDR technique gives displacement and heading direction estimations. However, due to the interference of many kinds of metal materials to the magnetic field in buildings, the heading direction estimation has a large error. In our case, each observation is a displacement estimation and is represented by $(dist)$.
 
@@ -299,7 +309,7 @@ where $w=|S_a|$, $k=|S_b|$ and $2<w<k$. Given segment candidate set $G$ and the 
 	\end{array}} \right.
 \end{equation}
 
-where $d$ is the threshold to distinguish two Wi-Fi fingerprint sequences. A pilot study is conducted to evaluate the dissimilarities between two fingerprint sequences of same and different road segments and the experimental result is shown in Fig. \ref{fig-wifidist}. In the paper, $d$ is set to $0.63$ based on the experiment. 
+where $d$ is the threshold to distinguish two Wi-Fi fingerprint sequences. A pilot study is conducted to evaluate the dissimilarities between two fingerprint sequences of same and different road segments and the experimental result is shown in Fig. \ref{fig-wifidist}. In the paper, $d$ is set to $0.773$ based on the experiment. 
 
 \begin{figure}[!htbp]
 	\centering
@@ -420,13 +430,23 @@ Euclidean distance between the estimated position and the ground truth is introd
 
 \begin{figure}[!htbp]
 	\centering
-	\includegraphics[width=4.6in]{AiFiMatch-OnlinePosition}
-	\caption{Online positioning results for Each Trajectory.}
+	\includegraphics[width=4.8in]{AiFiMatch-OnlinePosition}
+	\caption{Online positioning results for each trajectory. (a) $T_1$. (b) $T_2$. (c) $T_3$}
 	\label{fig-online}
 \end{figure}
 
 %% ------ TODO: inertial sensor error ------ %%
 
+\subsubsection{Influence of Step Length Error and Heading Error: }
+
+The major errors of PDR techniques are mainly from step length errors and heading direction errors. We compare the performance of AiFiMatch algorithm in terms of convergence to map matching algorithm proposed by \emph{Zhou et al}. Distance traveled before converging to a unique states sequence reflects the convergence speed. The greater the traveled distance, the slower is the convergence speed. Fig. \ref{fig-converg} shows the traveled distance before convergence for \emph{Zhou et al}, AiFiMatch without Wi-Fi enhancement and AiFiMatch with Wi-Fi enhancement. At the initial stage, fingerprint database is empty ($T_1$), AiFiMatch and \emph{Zhou et al.} both successfully converge even without known the initial point. AiFiMatch without Wi-Fi enhancement and map matching algorithm proposed by \emph{Zhou et al.} fail to converge ($\infty$ means $T_2$ cannot be converged.) due to the symmetry of building structure. However, with the help of Wi-Fi signal, $T_2$ reaches convergence quickly. Mostly, with Wi-Fi enhancement, the traveled distance is much shorter than without Wi-Fi enhancement($T_2, T_3$). 
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=4.56in]{AiFiMatch-ErrInfluence}
+	\caption{Online positioning errors for each trajectory with given standard deviations of step length and heading direction. (a) $T_1$. (b) $T_2$. (c) $T_3$. (d) $T_1$. (e) $T_2$. (f) $T_3$.}
+	\label{fig-errinfluence}
+\end{figure}
 
 \subsubsection{Convergence Speed:}
 
@@ -451,7 +471,7 @@ We compare the performance of AiFiMatch algorithm in terms of convergence to map
 \begin{figure}[!htbp]
 	\centering
 	\includegraphics[width=2.3in]{AiFiMatch-Convergence}
-	\caption{Distance Traveled before Convergence for Each Trajectory.}
+	\caption{Distance traveled before convergence for each trajectory.}
 	\label{fig-converg}
 \end{figure}
 
@@ -472,7 +492,7 @@ The offline positioning results are derived retrospectively after matching the w
 		\hfil
 	\subfloat[$T_3\ Offline\ Positioning\ Results$]{\includegraphics[width=2.3in]{AiFiMatch-OfflineTraject3}%
 		\label{fig-offlineT3}}
-	\caption{ Environment Setup and Offline Positioning Results for Each Trajectory}
+	\caption{ Environment setup and offline positioning results for each trajectory}
 	\label{fig-envandoffline}
 \end{figure*}
 
