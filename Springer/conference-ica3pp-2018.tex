@@ -158,7 +158,7 @@ In the balance of this section, we give the details of three preprocessing compo
 
 \subsubsection{PDR Implementation Based on Smartphone:}
 
-PDR is a positioning scheme that derives the current position by adding the estimated displacement to the previous one based on motion sensors carried by smartphones. In PDR scheme, the pedestrian's position is usually updated by the step and the heading direction during one step is supposed to be unchanged. The pedestrian's position after $k-1$ steps can be denoted as $(x_{k-1},y_{k-1})$. The $k$-th step length and heading direction are denoted as $sl_k$ and $\theta_k$, respectively. Then, the pedestrian's position after $k$ steps can be obtained by the following formula:
+PDR is a positioning scheme that derives the current position by adding the estimated displacement to the previous one based on motion sensors carried by smartphones. In PDR scheme, the pedestrian's position is usually updated by the step and the heading direction during one step is supposed to be unchanged. The pedestrian's position after $k-1$ steps can be denoted as $(x_{k-1},y_{k-1})$. The $k$-th step length and heading direction are denoted as $sl_k$ and $\theta_k$, respectively. Then, the pedestrian's position after $k$ steps can be obtained by the following equation:
 \begin{equation}
 \label{equ_pdr}
 \left( {\begin{array}{*{20}{c}}
@@ -213,7 +213,7 @@ In this paper, AiFiMatch considers four types of pedestrian activities: stationa
 \end{table}
 \vspace{-30pt}
 
-\subsubsection{Indoor Floor plan Abstraction:}
+\subsubsection{Indoor Floor Plan Abstraction:}
 
 In the indoor environment, there are many activity-relative locations such as corridor corners and entrances of rooms where pedestrians may perform different activities other than normal walking. These special locations divide the indoor roads into segments. With road segments as nodes in the form of \emph{(coordinate of first endpoint $(x_1,y_1)$, accessible direction of first endpoint $({\varphi}_1)$, coordinate of second endpoint $(x_2,y_2)$, accessible direction of second endpoint $({\varphi}_2)$)}, the activity type from one road segment to another as directional edges in the form of \emph{(Activity Type (AT))}, the indoor floor plan would be represented as a direction graph. Fig. \ref{fig-abstract} shows an example of indoor floor abstraction. 
 
@@ -238,19 +238,19 @@ Taking computing power and energy limit of a smartphone into account, our propos
 
 2) $V = \left\{ {{v_1},{v_2},{v_3}, \ldots ,{v_M}} \right\}$ is the set of observations from the model and $M = \left| V \right|$. For each walking trajectory of a pedestrian, PDR technique gives displacement and heading direction estimations. However, due to the interference of many kinds of metal materials to the magnetic field in buildings, the heading direction estimation has a large error. Therefore, in our case, each observation is a displacement estimation and is represented by \emph{(dist)}.
 
-3) $A = \left\{ {{a_{ij}}} \right\}$ is the state transition probability distribution, where \\ ${a_{ij}} = p\left\{ {{q_{t + 1}} = {s_j}|{q_t} = {s_i}} \right\}, i, j \le N$, where ${q_t}$ denotes the state at time $t$. In our case, the transition probability $a_{ij}$ is the probability of walking to the next road segment $s_{j,t}$ given the current road segment is $s_{i,t-1}$. Intuitively, for probable transition between two road segments, the pedestrian's activity should match the activity type between the same two segments. Therefore, given the detected activity of a pedestrian ${Ped_{AT}}(t)$ at time $t$ and the activity type between two segments ${Seg_{AT}}^{ij}$, AiFiMatch models this intuition by the formula \ref{equ_transition}, where $p({Ped_{AT}}(t)|{Seg_{AT}}^{ij})$ can be found in confusion matrix.
+3) $A = \left\{ {{a_{ij}}} \right\}$ is the state transition probability distribution, where \\ ${a_{ij}} = p\left\{ {{q_{t + 1}} = {s_j}|{q_t} = {s_i}} \right\}, i, j \le N$, where ${q_t}$ denotes the state at time $t$. In our case, the transition probability $a_{ij}$ is the probability of walking to the next road segment $s_{j,t}$ given the current road segment is $s_{i,t-1}$. Intuitively, for probable transition between two road segments, the pedestrian's activity should match the activity type between the same two segments. Therefore, given the detected activity of a pedestrian ${Ped_{AT}}(t)$ at time $t$ and the activity type between two segments ${Seg_{AT}}^{ij}$, AiFiMatch models this intuition by the equation \ref{equ_transition}, where $p({Ped_{AT}}(t)|{Seg_{AT}}^{ij})$ can be found in confusion matrix.
 \begin{equation}
 \label{equ_transition}
 p({s_{j,t}}|{s_{i,t - 1}}) = p({s_j}|{s_i},{Ped_{AT}}(t)) = p({Ped_{AT}}(t)|{Seg_{AT}}^{ij})
 \end{equation}
 
-4) $B = \left\{ {{b_i}(k)} \right\}$ is the observation probability distribution in state $i$, where ${b_i}(k) = p\{ {z_t} = {v_k}|{q_t} = {s_i}\},1 \le i \le N,1 \le k \le M$ and $z_t$, $q_t$ are the observation and state at time $t$, respectively. Observation probabilities also called emission probabilities represent the likelihood that a measurement resulted from a given state. In our case, given a displacement observation ${v_k}.dist(t)$, there is an emission probability $p({v_k}.dist(t)|{s_i}.leng)$ for each candidate road segment $s_i$, where ${s_i}.leng$ denotes the length of road segment $s_i$ which can be obtained from the coordinates of two endpoints of this road segment. If a pedestrian has passed the complete road segment $s_i$, AiFiMatch models the emission probability as a Gaussian Distribution:
+4) $B = \left\{ {{b_i}(k)} \right\}$ is the observation probability distribution in state $i$, where ${b_i}(k) = p\{ {o_t} = {v_k}|{q_t} = {s_i}\},1 \le i \le N,1 \le k \le M$ and $o_t$, $q_t$ are the observation and state at time $t$, respectively. Observation probabilities also called emission probabilities represent the likelihood that a measurement resulted from a given state. In our case, given a displacement observation ${v_k}.dist(t)$, there is an emission probability $p({v_k}.dist(t)|{s_i}.leng)$ for each candidate road segment $s_i$, where ${s_i}.leng$ denotes the length of road segment $s_i$ which can be obtained from the coordinates of two endpoints of this road segment. If a pedestrian has passed the complete road segment $s_i$, AiFiMatch models the emission probability as a Gaussian Distribution:
 \begin{equation}
 \label{equ_emission1}
 {f_1}({\rm{v_k}}{\rm{.dist(t),}}{{\rm{s}}_{\rm{i}}}{\rm{.leng}}) = \frac{1}{{\sqrt {2\pi } {\sigma _d}}}{e^{ - \frac{{{{({v_k}.dist(t) - {s_i}.leng)}^2}}}{{2{{\sigma}_d}^2}}}}
 \end{equation}
 
-where ${\sigma}_d$ is the standard deviation of the measured displacement. Based on the distance calculation method of PDR, the displacement is in direction proportion to step length. Therefore, ${\sigma}_d$ can be obtained based on the standard deviation of step length ${\sigma}_s$. Considering the situation that a pedestrian is walking on the road segment, all long enough candidate road segments should have the same probability, AiFiMatch models the situation using a formula as:
+where ${\sigma}_d$ is the standard deviation of the measured displacement. Based on the distance calculation method of PDR, the displacement is in direction proportion to step length. Therefore, ${\sigma}_d$ can be obtained based on the standard deviation of step length ${\sigma}_s$. Considering the situation that a pedestrian is walking on the road segment, all long enough candidate road segments should have the same probability, AiFiMatch models the situation using the equation as:
 \begin{equation}
 {f_2}({\rm{v_k}}{\rm{.dist(t),}}{{\rm{s}}_{\rm{i}}}{\rm{.leng}}) = \frac{1}{{\sqrt {2\pi } {\sigma _d}}}{e^{-4.5}},{v_k}.dist(t) + 3{\sigma _d} \le {s_i}.leng
 \end{equation}
@@ -263,7 +263,7 @@ p(v_k|s_i)=f({v_k}.dist(t),{s_i}.leng) = \left\{ {\begin{array}{*{20}{l}}
 	\end{array}} \right.
 \end{equation}
 
-5) $\pi  = \left\{ {{\pi _i}} \right\}$ is the initial state distribution, where ${\pi _i} = p\left\{ {{q_1} = {S_i}} \right\},1 \le i \le N$. If the starting point or the first road segment is known, the initial state distribution is $1$ since the first road segment is the only candidate; otherwise, all candidate road segments are selected by the \emph{Candidate Extraction} module and the initial state distribution is uniform in all candidates. Let $S_c$ denote the set of all candidates, and the initial state distribution is re-estimated after each step by the formula \ref{equ_initupdate} until the first location-related activity is detected.
+5) $\pi  = \left\{ {{\pi _i}} \right\}$ is the initial state distribution, where ${\pi _i} = p\left\{ {{q_1} = {S_i}} \right\},1 \le i \le N$. If the starting point or the first road segment is known, the initial state distribution is $1$ since the first road segment is the only candidate; otherwise, all candidate road segments are selected by the \emph{Candidate Extraction} module and the initial state distribution is uniform in all candidates. Let $S_c$ denote the set of all candidates, and the initial state distribution is re-estimated after each step by the equation \ref{equ_initupdate} until the first location-related activity is detected.
 \begin{equation}
 \label{equ_initupdate}
 {\pi _{i,t}} = {\pi _{i,t - 1}} \cdot f({v_k}.dist(t),{s_i}.leng),{s_i} \in {S_c}
@@ -301,7 +301,7 @@ AiFiMatch introduces Wi-Fi dissimilarity to distinguish multiple hypotheses due 
 \label{equ-jad}
 \end{equation}
 
-where Equation \ref{equ-jad} is known as Jaccard distance. With this dissimilarity of two fingerprints, we define the similarity function $L(S_a, S_b)$ between two fingerprint sequences $S_a = (f_1^a,f_2^a,\cdots,f_w^a)$, $S_b = (f_1^b, f_2^b, \cdots, f_k^b)$:
+where equation \ref{equ-jad} is known as Jaccard distance. With this dissimilarity of two fingerprints, we define the similarity function $L(S_a, S_b)$ between two fingerprint sequences $S_a = (f_1^a,f_2^a,\cdots,f_w^a)$, $S_b = (f_1^b, f_2^b, \cdots, f_k^b)$:
 \begin{equation}
 \begin{array}{c}
 L({S_a},{\rm{ }}{S_b}) = \min (\frac{1}{w}\sum\limits_{t = 1}^w {{J_\delta }({f_t}^a,{f_{i + t}}^b),0 \le i \le k - w,} \\
@@ -320,7 +320,7 @@ where $w=|S_a|$, $k=|S_b|$ and $2<w<k$. Given segment candidate set $G$ and the 
 
 where $d$ is the threshold to distinguish two Wi-Fi fingerprint sequences. 
 
-A pilot study is conducted to evaluate the dissimilarities between two fingerprint sequences of same and different road segments. A prototype installed in three smartphones (360 N5, OPPO R827T and Xiaomi 3W) is used to collect Wi-Fi RSS values at $1$Hz. Each participant was asked to walk along two symmetric road segments in two directions. The participant with 360 N5 smartphone was asked to repeat $12$ times while the others were asked to repeat $6$ times. Among them, $6$ Wi-Fi data collected by 360 N5 smartphone were used as Wi-Fi fingerprint database, while other Wi-Fi data were used as online Wi-Fi fingerprint sequences. The maximum and minimum dissimilarities between fingerprint sequences of same and different road segments are shown in Fig. \ref{fig-wifidist}. From Fig. \ref{fig-wifidist}, with increases in the length of Wi-Fi fingerprint sequence $w$, the dissimilarity between two sequences of same segments gradually decreases, while the dissimilarity between two sequences of different segments gradually increases. In the paper, $d$ is set to $0.773$ based on the experiment. 
+A pilot study is conducted to evaluate the dissimilarities between two fingerprint sequences of same and different road segments. A prototype installed in three smartphones (360 N5, OPPO R827T and Xiaomi 3W) is used to collect Wi-Fi RSS values at $1$Hz. Each participant was asked to walk along two symmetric road segments in two directions. The participant with 360 N5 smartphone was asked to repeat $12$ times while the others were asked to repeat $6$ times. Among them, $6$ Wi-Fi data collected by 360 N5 smartphone were used as Wi-Fi fingerprint database, while other Wi-Fi data were used as online Wi-Fi fingerprint sequences. The maximum and minimum dissimilarities between fingerprint sequences of same and different road segments are shown in Fig. \ref{fig-wifidist}. From Fig. \ref{fig-wifidist}, with increases in the length of Wi-Fi fingerprint sequence $w$, the dissimilarity between two sequences of same segments gradually decreases, while the dissimilarity between two sequences of different segments gradually increases. Considering the device diversity, in order to avoid missing the correct alternative segments, the minimum value of the threshold $d$ is $0.773$.
 
 \vspace{-10pt}
 \begin{figure}[!htbp]
@@ -333,25 +333,26 @@ A pilot study is conducted to evaluate the dissimilarities between two fingerpri
 
 \subsection{Optimal State Sequence Estimation}
 
-Once the HMM parameters are estimated, we can user the Viterbi algorithm to get the most probable hidden states sequence $Q = ({q_1},{q_2},...,{q_k})$ for a given observation sequence $O = ({o_1},{o_2},...,{o_k})$. A Viterbi variable ${\delta _t}(i)$ is defined by formula \ref{equ-vtbvar} to represent that, at time $t$, the HMM model reaches the hidden state $s_i$ along a certain path and outputs the maximum probability.
+Once the HMM parameters are estimated, we can user the Viterbi algorithm to get the most probable hidden states sequence $Q = ({q_1},{q_2},...,{q_k})$ for a given observation sequence $O = ({o_1},{o_2},...,{o_k})$. A Viterbi variable ${\delta _t}(i)$ is defined by equation \ref{equ-vtbvar} to represent that, at time $t$, the HMM model reaches the hidden state $s_i$ along a certain path and outputs the maximum probability.
 \begin{equation}
 	\label{equ-vtbvar}
 	{\delta _t}(i) = max\{ p({q_1},{q_2},...,{q_t} = {s_i},{o_1},{o_2},...,{o_t}|\lambda )\}
 \end{equation}
 
-At time $t+1$, the maximum probability reaching the hidden state $s_j$ can be recursively derived from the Viterbi variable at time $t$ by the following formula. 
+At time $t+1$, the maximum probability reaching the hidden state $s_j$ can be recursively derived from the Viterbi variable at time $t$ by the following equation. 
 \begin{equation}
 	{\delta _{t + 1}}(j) = [\mathop {max}\limits_i \{ {\delta _t}(i) \cdot p({q_{t + 1}} = {s_j}|{q_t} = {s_i})\} ] \cdot p({o_{t + 1}}|{q_{t + 1}}),1 \le t \le k
 \end{equation}
 
 For AiFiMatch to operate in real-time, it cannot wait until the whole sequence is available. Hence, The online Viterbi algorithm \cite{bloit2008short} is applied to compute the maximum likelihood sequence of states using dynamic programming. AiFiMatch users Viterbi algorithm in an incremental manner. Every time a new step of a pedestrian is detected, the HMM parameters are calculated for the new introduced sensors data and the associated candidate states.  Fig. \ref{fig-viterbi} illustrates the proposed HMM model Viterbi decoding. The decoded sequence is colored in blue.
 
-During the beginning process of the algorithm, if the number of states is too small, the most probable states sequence is not always the correct one, especially when the starting point of pedestrian is unknown. Therefore, we give a criteria by formula $c = {{{p_{fir}}} \mathord{\left/
+During the beginning process of the algorithm, if the number of states is too small, the most probable states sequence is not always the correct one, especially when the starting point of pedestrian is unknown. Therefore, we give a criteria by the equation $c = {{{p_{fir}}} \mathord{\left/
 		{\vphantom {{{p_{fir}}} {{p_{\sec }}}}} \right.
 		\kern-\nulldelimiterspace} {{p_{\sec }}}}$ to determine the status of this algorithm, where ${p_{fir}}$ is the highest probability of the states sequence and ${p_{\sec }}$ is the second highest probability of the states sequence. We set a threshold, if $c$ is greater than or equal to the threshold, we choose the Viterbi decoding result. The selected hidden states sequence represents the pedestrian's passed indoor road segments.
 
 AiFiMatch algorithm is summarized with the pseudocode in Algorithm \ref{alg_aifi}.  
 
+\vspace{-10pt}
 \begin{algorithm}[H]
 	\caption{AiFiMatch online map matching algorithm}
 	\label{alg_aifi}
@@ -375,6 +376,15 @@ AiFiMatch algorithm is summarized with the pseudocode in Algorithm \ref{alg_aifi
 		\STATE $S^{i}(t) \leftarrow next(fp,s_i)$
 		\STATE // Extract segments according to Wi-Fi data
 		\STATE $S^{i,wifi}(t) \leftarrow extract(data_{st:t}^{wifi},S^{i}(t))$
+				
+		\algstore{myalg}
+	\end{algorithmic}
+\end{algorithm}
+		
+\begin{algorithm}[t]
+	\begin{algorithmic}[1]
+		\algrestore{myalg}		
+
 		\FOR{$s_j\ \in\ S^{i,wifi}(t)$}
 		\STATE $tr[i][j] \leftarrow p(s_j|s_i,{Ped_{AT}(t)})$
 		\ENDFOR
@@ -390,15 +400,6 @@ AiFiMatch algorithm is summarized with the pseudocode in Algorithm \ref{alg_aifi
 		\STATE $k \leftarrow k+1$
 		\STATE $S_{k}(t) \leftarrow S(t)$
 		
-				
-	\algstore{myalg}
-	\end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}
-	\begin{algorithmic}[1]
-	\algrestore{myalg}
-				
 		\ELSE // Not a location-related activity
 		\STATE $ob \leftarrow [\ ],\ S_{k}(t) \leftarrow S_{k}(t-1)$
 		\STATE // Update the observation probability
@@ -408,7 +409,7 @@ AiFiMatch algorithm is summarized with the pseudocode in Algorithm \ref{alg_aifi
 		\ENDFOR
 		\STATE ${VtbArr}_{k}(t) \leftarrow viterbi({VtbArr}_{k}(t-1), ob[\ ])$
 		\ENDIF	
-
+		
 		\STATE // Optimal State Sequence
 		\STATE ${Q(t)} \leftarrow None$
 		\IF{$check\_status(VtbArr^{k}(t))=Convergence$}
@@ -419,44 +420,59 @@ AiFiMatch algorithm is summarized with the pseudocode in Algorithm \ref{alg_aifi
 		\STATE $Ped_{loc}(t) \leftarrow update\_location(data_{st:t}, Q(t))$
 	\end{algorithmic}
 \end{algorithm}
+\vspace{-10pt}
+
 
 \section{Evaluation}
 
 \subsection{Environment Setup}
 
-In this section, we show our evaluation for the performance of AiFiMatch in real-world environment, we conducted experiments in the fifth floor of a teaching hall on campus. Approximately, we covered a $78.95m \times 56.40m$ floor plan, as shown in Fig. \ref{fig-envionment}. A prototype is implemented and installed on a 360 N5 Android version 6.0.1 smartphone, a Xiaomi MI 3W Android version 6.0.1 smartphone and a Coolpad 8675-FHD Android version 4.4.0 smartphone. The prototype samples the accelerometer, gyroscope and magnetometer sensors at $50$Hz and Wi-Fi at $1$Hz. Three participants (two males and one female) were asked to complete the experiments. The participants were asked to walking along Trajectory $No.1$ ($T_1$), Trajectory $No.2$ ($T_2$) and Trajectory $No.3$ ($T_3$) in a constant speed. Each trajectory was repeated six times by all participants. In order to record the walking trajectories, all the participants' shoes were painted with colored powder. This offered the ground truth.
+In this section, we show our evaluation for the performance of AiFiMatch in real-world environment, we conducted experiments in the fifth floor of a teaching hall on campus. Approximately, we covered a $78.95m \times 56.40m$ floor plan, as shown in Fig. \ref{fig-envionment}. A prototype is implemented and installed on a 360 N5 Android version 6.0.1 smartphone, a OPPO R827T Android version 4.4.0 smartphone and a Xiaomi 3W Android version 6.0.1 smartphone. The prototype samples the accelerometer, gyroscope and magnetometer sensors at $50$Hz and Wi-Fi at $1$Hz. Three participants (two males and one female) were asked to complete the experiments. The participants were asked to walking along Trajectory $No.1$ ($T_1$), Trajectory $No.2$ ($T_2$) and Trajectory $No.3$ ($T_3$) in a constant speed. Each trajectory was repeated six times by all participants. In order to record the walking trajectories, all the participants' shoes were painted with colored powder. This offered the ground truth.
 
 \subsection{Performance of Map Matching}
 
-To evaluate AiFiMatch map matching performance, we start by showing the online positioning performance of AiFiMatch and basic PDR technique. After that, we analyze the effect of inertial sensor error on positioning accuracy. Then, we discuss the convergence performance as compared to an activity sequence-based map matching algorithm proposed by \emph{Zhou et al} \cite{zhou2015activity}. Finally, we show the offline positioning results when using AiFiMatch.
+To evaluate AiFiMatch map matching performance, we start by showing the online positioning performance of AiFiMatch and basic PDR technique. After that, we analyze the effect of step length and heading errors on positioning accuracy. Then, we discuss the convergence performance as compared to an activity sequence-based map matching algorithm proposed by \emph{Zhou et al} \cite{zhou2015activity}. Finally, we show the offline positioning results when using AiFiMatch.
 
 \subsubsection{Online Positioning Performance:}
 
 Euclidean distance between the estimated position and the ground truth is introduced to indicate positioning accuracy.  Fig. \ref{fig-online} shows the online positioning results of all trajectories for basic PDR algorithm with known initial point and AiFiMatch without known initial point.  Here, the mean position of all segment candidates' starting point is taken as initial point of AiFiMatch algorithm. Generally, for one trajectory, the greater the traveled distance, the larger the positioning error of PDR due to cumulative errors, Fig. \ref{fig-online} shows the trend.  However, after passing a number of steps, the traveled segment sequence determined by AiFiMatch even without known the initial point and the cumulative  errors are eliminated successfully.
 
+\vspace{-10pt}
 \begin{figure}[!htbp]
 	\centering
 	\includegraphics[width=4.8in]{AiFiMatch-OnlinePosition}
-	\caption{Online positioning results for each trajectory. (a) $T_1$. (b) $T_2$. (c) $T_3$}
+	\caption{Online Positioning Results for Each Trajectory. (a) $T_1$. (b) $T_2$. (c) $T_3$}
 	\label{fig-online}
 \end{figure}
+\vspace{-10pt}
 
-%% ------ TODO: inertial sensor error ------ %%
+\subsubsection{Influence of Step Length and Heading direction Errors: }
 
-\subsubsection{Influence of Step Length Error and Heading Error: }
+The major errors of PDR techniques are mainly from step length and heading direction errors. Therefore, we analyze the influence of step length and heading direction errors to the average online positioning errors. Both of them are supposed to follow the Gaussian distributions with a mean zero. $\sigma_s$ denotes the standard deviation of step length estimation and $\sigma_{\varphi}$ denotes the standard deviation of heading direction estimation. When $\sigma_s$ changes from $0.1$ m to $0.5$ m, $\sigma_{\varphi}$ is set to $10$ degree. When $\sigma_{\varphi}$ changes from $10$ degree to $50$ degree, $\sigma_s$ is set to $0.1$ m. Fig. \ref{fig-errinfluence} shows the results of all trajectories with different errors. The performance of AiFiMatch in all error cases is superior to the basic PDR technique. From Fig. \ref{fig-errinfluence} \emph{(a)-(c)}, with increasing step length error, the average online positioning errors increases gradually. The same trend is shown in Fig. \ref{fig-errinfluence} \emph{(d)-(f)}, reflecting the influence of heading direction errors on the average online positioning errors. $T_1$ and $T_3$ have five location-related activities while $T_2$ has only two. As a result, given the same heading direction errors, the online positioning performance of AiFiMatch is more robust to $T_1$ and $T_3$ than $T_2$, which can also be seen from Fig. \ref{fig-errinfluence} \emph{(d)-(f)}.
 
-The major errors of PDR techniques are mainly from step length errors and heading direction errors. We compare the performance of AiFiMatch algorithm in terms of convergence to map matching algorithm proposed by \emph{Zhou et al}. Distance traveled before converging to a unique states sequence reflects the convergence speed. The greater the traveled distance, the slower is the convergence speed. Fig. \ref{fig-converg} shows the traveled distance before convergence for \emph{Zhou et al}, AiFiMatch without Wi-Fi enhancement and AiFiMatch with Wi-Fi enhancement. At the initial stage, fingerprint database is empty ($T_1$), AiFiMatch and \emph{Zhou et al.} both successfully converge even without known the initial point. AiFiMatch without Wi-Fi enhancement and map matching algorithm proposed by \emph{Zhou et al.} fail to converge ($\infty$ means $T_2$ cannot be converged.) due to the symmetry of building structure. However, with the help of Wi-Fi signal, $T_2$ reaches convergence quickly. Mostly, with Wi-Fi enhancement, the traveled distance is much shorter than without Wi-Fi enhancement($T_2, T_3$). 
-
+\vspace{-10pt}
 \begin{figure}[!htbp]
 	\centering
 	\includegraphics[width=4.56in]{AiFiMatch-ErrInfluence}
-	\caption{Online positioning errors for each trajectory with given standard deviations of step length and heading direction. (a) $T_1$. (b) $T_2$. (c) $T_3$. (d) $T_1$. (e) $T_2$. (f) $T_3$.}
+	\caption{Online Positioning Errors for Each Trajectory with Given Standard Deviations of Step Length and Heading Direction. (a) $T_1$. (b) $T_2$. (c) $T_3$. (d) $T_1$. (e) $T_2$. (f) $T_3$.}
 	\label{fig-errinfluence}
 \end{figure}
+\vspace{-10pt}
+
+\vspace{-10pt}
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=2.3in]{AiFiMatch-Convergence}
+	\caption{Distance traveled before convergence for each trajectory.}
+	\label{fig-converg}
+\end{figure}
+\vspace{-10pt}
 
 \subsubsection{Convergence Speed:}
 
 We compare the performance of AiFiMatch algorithm in terms of convergence to map matching algorithm proposed by \emph{Zhou et al}. Distance traveled before converging to a unique states sequence reflects the convergence speed. The greater the traveled distance, the slower is the convergence speed. Fig. \ref{fig-converg} shows the traveled distance before convergence for \emph{Zhou et al}, AiFiMatch without Wi-Fi enhancement and AiFiMatch with Wi-Fi enhancement. At the initial stage, fingerprint database is empty ($T_1$), AiFiMatch and \emph{Zhou et al.} both successfully converge even without known the initial point. AiFiMatch without Wi-Fi enhancement and map matching algorithm proposed by \emph{Zhou et al.} fail to converge ($\infty$ means $T_2$ cannot be converged.) due to the symmetry of building structure. However, with the help of Wi-Fi signal, $T_2$ reaches convergence quickly. Mostly, with Wi-Fi enhancement, the traveled distance is much shorter than without Wi-Fi enhancement($T_2, T_3$). 
+
+
 
 %\begin{figure}[!htbp]
 %	\begin{minipage}[t]{0.5\textwidth}
@@ -474,18 +490,15 @@ We compare the performance of AiFiMatch algorithm in terms of convergence to map
 %	\end{minipage}
 %\end{figure}
 
-\begin{figure}[!htbp]
-	\centering
-	\includegraphics[width=2.3in]{AiFiMatch-Convergence}
-	\caption{Distance traveled before convergence for each trajectory.}
-	\label{fig-converg}
-\end{figure}
+
 
 \subsubsection{Offline Positioning Performance:}
 
 The offline positioning results are derived retrospectively after matching the walking trajectory of a pedestrian to a unique road segments sequence by AiFiMatch. Fig. \ref{fig-envandoffline} shows the tracking trajectories and some details are summarized in Table 2. AiFiMatch system tracked pedestrians' trajectories accurately in the experiment environments and the mean error of the offline positioning is about $1.24$ m.
 
-\begin{figure*}[!ht]
+
+\vspace{-10pt}
+\begin{figure*}[!htbp]
 	\centering
 	\subfloat[$Experiment\ Environment$]{\includegraphics[width=2.325in]{AiFiMatch-Environment}%
 		\label{fig-envionment}}
@@ -495,12 +508,14 @@ The offline positioning results are derived retrospectively after matching the w
 	\vfil
 	\subfloat[$T_2\ Offline\ Positioning\ Results$]{\includegraphics[width=2.3in]{AiFiMatch-OfflineTraject2}%
 		\label{fig-offlineT2}}
-		\hfil
+	\hfil
 	\subfloat[$T_3\ Offline\ Positioning\ Results$]{\includegraphics[width=2.3in]{AiFiMatch-OfflineTraject3}%
 		\label{fig-offlineT3}}
 	\caption{ Environment setup and offline positioning results for each trajectory}
 	\label{fig-envandoffline}
 \end{figure*}
+\vspace{-10pt}
+
 
 \begin{table}
 	\newcommand{\tabincell}[2]{\begin{tabular}{@{}#1@{}}#2\end{tabular}}
@@ -523,13 +538,14 @@ The offline positioning results are derived retrospectively after matching the w
 
 \section{Conclusion}
 
-This paper proposed AiFiMatch: a novel map matching Algorithm based on activity detection and crowd-sourced Wi-Fi for indoor pedestrian tracking and positioning. AiFiMatch leverages the smartphone's motion sensors to detect different activities using a decision tree and then divides the walking trajectory into trajectory subset sequence. The HMM model is used to match walking trajectory subset sequence to road segments sequence.  AiFiMatch can also construct and update fingerprint database based on road segment by crowd-sourcing. We provided the AiFiMatch's system architecture and presented the details of different modules. The performance of AiFiMatch has been evaluated by experiments in a building on campus. The results show that AiFiMatch can track pedestrian's trajectory accurately even without known initial point. In addition, with the help of Wi-Fi fingerprints, AiFiMatch reaches converge quickly and effectively solves the multiple hypotheses caused by symmetry of building structure. 
+This paper proposed AiFiMatch: a novel map matching Algorithm based on activity detection and crowd-sourced Wi-Fi for indoor pedestrian tracking and positioning. AiFiMatch leverages the smartphone's motion sensors to detect different activities using a decision tree and then divides the walking trajectory into trajectory subset sequence. The HMM model is used to match walking trajectory subset sequence to road segments sequence.  AiFiMatch can also construct and update fingerprint database based on road segment by crowd-sourcing. We provided the AiFiMatch's system architecture and presented the details of different modules. The performance of AiFiMatch has been evaluated by experiments in a building on campus. The results show that AiFiMatch can track pedestrian's trajectory accurately even without known initial point and is robust to a certain degree of step length and heading direction errors. In addition, with the help of Wi-Fi fingerprints, AiFiMatch reaches converge quickly and effectively solves the multiple hypotheses caused by symmetry of building structure. 
 
 %
 % ---- Bibliography ----
 %
 %\bibliographystyle{splncs}
 %\bibliographystyle{splncs03_unsrt}
+%\bibliographystyle{unsrt}
 %% ------ update by springer lncs ----- %%
 \bibliographystyle{splncs04}
 \bibliography{AiFiMatch}
